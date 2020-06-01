@@ -100,6 +100,11 @@ def main() :
             if pathlib.Path(result_file).is_file():
                 continue
             else: 
+                shapes = list(set([elm.shape for elm in Hv]))
+                if len(shapes)>1 : 
+                    print('the maps do not have the same shape, break')
+                    break
+                
                 barycenter = convolutional_barycenter(Hv, reg, tuple_weights, niter = niter, tol = tol, sharpening = sharpening, verbose = verbose) 
 
                 with mrcfile.new(result_file) as mrc:
