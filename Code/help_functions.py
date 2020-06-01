@@ -32,7 +32,6 @@ def compute_from_shape_names(list_shape_names,N, weights):
         [ndarray] -- Wasserstein barycenter of input distributions
     """
     Hv = []
-    if result_file == None : 
 
     for i in list_shape_names:
         Hv.append(normalize(load_volume(N,i)[1]))
