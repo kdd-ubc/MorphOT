@@ -1,0 +1,10 @@
+name: pyot
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - jupyter
+  - spyder
+  - numpy
+prefix: C:\Users\arthu\anaconda3\envs\pyot
+
