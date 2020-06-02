@@ -3,8 +3,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - python=3.7
   - jupyter
   - spyder
   - numpy
+  - cupy
 prefix: C:\Users\arthu\anaconda3\envs\pyot
 
