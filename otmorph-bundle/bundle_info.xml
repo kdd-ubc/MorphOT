@@ -1,0 +1,57 @@
+<!--
+ChimeraX bundle names must start with "ChimeraX-"
+to avoid clashes with package names in pypi.python.org.
+When uploaded to the ChimeraX toolshed, the bundle
+will be displayed without the ChimeraX- prefix.
+-->
+
+<BundleInfo name="ChimeraX-MorphOT"
+	    version="0.1" package="chimerax.morphot"
+  	    minSessionVersion="1" maxSessionVersion="1">
+
+  <!-- Additional information about bundle source -->
+  <Author>Arthur Ecoffet</Author>
+  <Email>arthurecoffet@gmail.com</Email>
+  <URL></URL>
+
+  <!-- Synopsis is a one-line description
+       Description is a full multi-line description -->
+  <Synopsis>Basic command line implementation of OT interpolation based on solomon's et al.</Synopsis>
+  <Description> Based on convolutional wasserstein distances calculation described in : 
+  Justin Solomon, Fernando de Goes, Gabriel Peyré, Marco Cuturi, Adrian Butscher, et al.. Convolutional wasserstein distances. ACM Transactions on Graphics, Association for Computing Machinery,
+2015, 34 (4), pp.66:1-66:11. ff10.1145/2766963ff. ffhal-01188953f
+  </Description>
+
+  <!-- Categories is a list where this bundle should appear -->
+  <Categories>
+    <Category name="General"/>
+  </Categories>
+
+  <!-- Dependencies on other ChimeraX/Python packages -->
+  <Dependencies>
+    <Dependency name="ChimeraX-Core" version=">=0.1"/>
+    <Dependency name="ChimeraX-Map" version=">=0.1"/>
+  </Dependencies>
+
+  <!-- Python and ChimeraX-specific classifiers
+       From https://pypi.python.org/pypi?%3Aaction=list_classifiers
+       Some Python classifiers are always inserted by the build process.
+       These include the Environment and Operating System classifiers
+       as well as:
+         Framework :: ChimeraX
+         Intended Audience :: Science/Research
+         Programming Language :: Python :: 3
+         Topic :: Scientific/Engineering :: Visualization
+         Topic :: Scientific/Engineering :: Chemistry
+         Topic :: Scientific/Engineering :: Bio-Informatics
+       The "ChimeraX :: Bundle" classifier is also supplied automatically.  -->
+  <Classifiers>
+    <!-- Development Status should be compatible with bundle version number -->
+    <PythonClassifier>Development Status :: 3 - Alpha</PythonClassifier>
+    <PythonClassifier>License :: Freeware</PythonClassifier>
+    <!-- ChimeraX classifiers describe supplied functionality -->
+    <ChimeraXClassifier>ChimeraX :: Command :: volumeperso morphOT :: General ::
+	Compute OT interpolation of volumes</ChimeraXClassifier>
+  </Classifiers>
+
+</BundleInfo>

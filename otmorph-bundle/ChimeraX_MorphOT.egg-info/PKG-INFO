@@ -1,0 +1,30 @@
+Metadata-Version: 1.2
+Name: ChimeraX-MorphOT
+Version: 0.1
+Summary: Basic command line implementation of OT interpolation based on solomon's et al.
+Home-page: UNKNOWN
+Author: Arthur Ecoffet
+Author-email: arthurecoffet@gmail.com
+License: UNKNOWN
+Description: Based on convolutional wasserstein distances calculation described in : 
+          Justin Solomon, Fernando de Goes, Gabriel Peyré, Marco Cuturi, Adrian Butscher, et al.. Convolutional wasserstein distances. ACM Transactions on Graphics, Association for Computing Machinery,
+        2015, 34 (4), pp.66:1-66:11. ff10.1145/2766963ff. ffhal-01188953f
+Platform: UNKNOWN
+Classifier: Framework :: ChimeraX
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Development Status :: 3 - Alpha
+Classifier: License :: Freeware
+Classifier: Environment :: MacOS X :: Aqua
+Classifier: Environment :: Win32 (MS Windows)
+Classifier: Environment :: X11 Applications
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows :: Windows 10
+Classifier: Operating System :: POSIX :: Linux
+Classifier: ChimeraX :: Bundle :: General :: 1,1 :: chimerax.morphot ::  :: 
+Classifier: ChimeraX :: Command :: volumeperso morphOT :: General ::
+	Compute OT interpolation of volumes
+Requires-Python: >= 3.6
