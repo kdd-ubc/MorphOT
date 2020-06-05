@@ -273,3 +273,37 @@ def ot_combination(f1, v1, f2, v2, v, subregion, step):
   #m[:,:,:] = f1*m1[:,:,:] + f2*m2[:,:,:]
   m[:,:,:] = convolutional_barycenter([m1,m2],0.8,(f1,f2),niter=20,verbose=False)
   v.data.values_changed()
+
+
+def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, model_id = None) : 
+  v1 = volumes[0]
+  v2 = volumes[1]
+
+  m1 = v1.matrix(step = step, subregion = subregion)
+  m2 = v2.matrix(step = step, subregion = subregion)
+
+  print(m1.sum(),m2.sum())
+  alpha = (weights[0],weights[1])
+  #region = v1.subregion(step, subregion)
+  #origin, step = v1.region_origin_and_step(region)
+
+  
+  r = v1.writable_copy(require_copy = True, copy_colors = False,
+                           unshow_original = False,
+                           subregion = subregion, step = step,
+                           model_id = model_id, name = '%s %s weights %s'%(v1.name,v2.name,str(alpha)))
+
+  m = r.full_matrix()
+
+  from .help_functions import convolutional_barycenter
+  m[:,:,:] = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
+
+  #from chimerax.map.data import ArrayGridData
+  #d = v1.data
+
+  #name = '%s %s barycenter, weights %s'%(v1.name, v2.name, str(weights))
+
+  #gg = ArrayGridData(barycenter_m, origin, step, d.cell_angles, d.rotation,
+                    # name = name)
+  r.data.values_changed()
+  return r

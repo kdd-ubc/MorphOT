@@ -27,4 +27,6 @@ Classifier: Operating System :: POSIX :: Linux
 Classifier: ChimeraX :: Bundle :: General :: 1,1 :: chimerax.morphot ::  :: 
 Classifier: ChimeraX :: Command :: volumeperso morphOT :: General ::
 	Compute OT interpolation of volumes
+Classifier: ChimeraX :: Command :: volumeperso onebarycenter :: General ::
+	Compute OT interpolation of volumes
 Requires-Python: >= 3.6

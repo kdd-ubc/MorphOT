@@ -50,9 +50,25 @@ class _MyAPI(BundleAPI):
                                         ('constant_volume', BoolArg),
                                         ('scale_factors', FloatsArg),
                                         ('hide_original_maps', BoolArg),
-                                        ('interpolate_colors', BoolArg)] + ssm_kw,
+                                        ('interpolate_colors', BoolArg),
+                                        ('reg', FloatArg),
+                                        ('niter',IntArg)] + ssm_kw,
                             synopsis = 'OT interpolate maps')
-        register(ci.name, morphot_desc, func)
+            register(ci.name, morphot_desc, func)
+
+        if ci.name == 'volumeperso onebarycenter' : 
+            from . import morph
+            from . import cmd 
+            func = cmd.volume_barycenterOT
+            varg = cmd.varg 
+            ssm_kw = cmd.ssm_kw 
+            onebarycenter_desc = CmdDesc(required = varg + [('weights', Float2Arg)],
+                                keyword = [
+                                            ('niter', IntArg),
+                                            ('reg', FloatArg),
+                                            ('interpolate_colors', BoolArg)] + ssm_kw,
+                                synopsis = 'OT barycenter maps')
+            register(ci.name, onebarycenter_desc, func)
 
         
     

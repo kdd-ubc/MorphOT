@@ -74,11 +74,13 @@ def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,s
     """
     try : 
         import cupy
+        print('cupy is here, running on gpu')
         is_gpu = True
     except :
         print('cupy not installed / no cuda GPU on computer, running on cpu')
         is_gpu = False 
         
+    print(alpha)
     if is_gpu :
         return convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh,niter,tol,sharpening, verbose)
     else : 
@@ -114,6 +116,11 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
     
     alpha = np.array(alpha)/np.array(alpha).sum()
     Hv = np.array(Hv)
+    mean_weights = (Hv[0].sum()*alpha[0]+Hv[1].sum()*alpha[1])
+
+    print('mean weights', mean_weights)
+    for i in range(len(Hv)):
+        Hv[i] = Hv[i]/Hv[i].sum()
     entropy_max = max_entropy(Hv)
     
     v = np.ones(Hv.shape)
@@ -121,7 +128,6 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
     barycenter = np.zeros(Hv[0].shape)
     
     change = 1
-    
     for j in range(niter):
         t0 = time.time()
         barycenterOld = barycenter
@@ -159,7 +165,7 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
         if change<tol :
             break
 
-    return barycenter
+    return barycenter*mean_weights
 
 # ----------------------------------------------------------------------------
 #
@@ -191,6 +197,10 @@ def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, t
     alpha = cp.array(alpha)
     alpha = alpha/alpha.sum()
     Hv = cp.array(Hv)
+    mean_weights = (Hv[0].sum()+Hv[1].sum())/2.
+    print('mean weights', mean_weights)
+    for i in range(len(Hv)):
+        Hv[i] = Hv[i]/Hv[i].sum()
     v = cp.ones(Hv.shape)
     Kw = cp.ones(Hv.shape)
 
@@ -230,8 +240,9 @@ def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, t
             print("iter : ",j , "change : ", change, 'time :', time.time()-t0)
         if change<tol :
             break
-
-    return cp.asnumpy(barycenter)
+    
+    
+    return cp.asnumpy(barycenter*mean_weights)
 
 
 

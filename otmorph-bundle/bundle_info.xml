@@ -31,6 +31,10 @@ will be displayed without the ChimeraX- prefix.
   <Dependencies>
     <Dependency name="ChimeraX-Core" version=">=0.1"/>
     <Dependency name="ChimeraX-Map" version=">=0.1"/>
+    <!-- -
+    <Dependency name="cupy-cuda102" version=">=0.1"/>
+    <!- -->
+    
   </Dependencies>
 
   <!-- Python and ChimeraX-specific classifiers
@@ -51,6 +55,8 @@ will be displayed without the ChimeraX- prefix.
     <PythonClassifier>License :: Freeware</PythonClassifier>
     <!-- ChimeraX classifiers describe supplied functionality -->
     <ChimeraXClassifier>ChimeraX :: Command :: volumeperso morphOT :: General ::
+	Compute OT interpolation of volumes</ChimeraXClassifier>
+    <ChimeraXClassifier>ChimeraX :: Command :: volumeperso onebarycenter :: General ::
 	Compute OT interpolation of volumes</ChimeraXClassifier>
   </Classifiers>
 
