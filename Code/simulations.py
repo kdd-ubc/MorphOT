@@ -13,9 +13,11 @@ def main() :
 
     # SETTING PARAMETERS : 
     # -------------------
+
     # Tuples of set of structure you want to get barycenters from, please include file format
     #list_structures = [('emd_4121.map.gz','emd_4122.map.gz','emd_4123.map.gz'),('2jd8_01.mrc','2jd8_012.mrc','2jd8_020.mrc')]
     list_structures = [('2jd8_01.mrc','2jd8_012.mrc','2jd8_020.mrc')]
+    #list_structures = [('cubes.mrc','sphere.mrc')]
     #list_structures = [('emd_4121.map.gz','emd_4122.map.gz','emd_4123.map.gz')]
     #list_structures = [('migrating_t0.jpg','migrating_t4.jpg'),
     #                    ('migrating_t4.jpg','migrating_t9.jpg'),
@@ -25,13 +27,14 @@ def main() :
 
     # -------------------
     # Set of weights for each tuple of structures. Type : list of list of tuples. Please have as many sub list as there are sub-simulations
-    #list_weights = [[(1,0,0),(0,1,0),(0,0,1),(1,1,1),(2,1,0),(0,1,2),(1,0,2),(2,0,1),(0,2,1),(1,2,0)],
-    #                [(1,0,0),(0,1,0),(0,0,1),(1,1,1),(2,1,0),(0,1,2),(1,0,2),(2,0,1),(0,2,1),(1,2,0)]]
-    #list_weights = [[(1,0,0),(0,1,0),(0,0,1),(1,1,1),(2,1,0),(0,1,2),(1,0,2),(2,0,1),(0,2,1),(1,2,0)]]
-    list_weights = [[(10,0),(9,1),(8,2),(7,3),(6,4),(5,5),(4,6),(3,7),(2,8),(1,9)],
-                    [(10,0),(9,1),(8,2),(7,3),(6,4),(5,5),(4,6),(3,7),(2,8),(1,9)],
-                    [(10,0),(9,1),(8,2),(7,3),(6,4),(5,5),(4,6),(3,7),(2,8),(1,9)],
-                    ]
+    # list_weights = [(10,0),(9,1),(8,2),(7,3),(6,4),(5,5),(4,6),(3,7),(2,8),(1,9),(0,10)] #for cubes and sphere 
+    #list_weights = [[(1,0,0),(0,1,0),(0,0,1),(1,1,1),(2,1,0),(0,1,2),(1,0,2),(2,0,1),(0,2,1),(1,2,0)],  
+    #                [(1,0,0),(0,1,0),(0,0,1),(1,1,1),(2,1,0),(0,1,2),(1,0,2),(2,0,1),(0,2,1),(1,2,0)]] # for 2jd8 files or emd
+    #list_weights = [[(1,0,0),(0,1,0),(0,0,1),(1,1,1),(2,1,0),(0,1,2),(1,0,2),(2,0,1),(0,2,1),(1,2,0)]] # same
+    #list_weights = [[(10,0),(9,1),(8,2),(7,3),(6,4),(5,5),(4,6),(3,7),(2,8),(1,9)],
+    #                [(10,0),(9,1),(8,2),(7,3),(6,4),(5,5),(4,6),(3,7),(2,8),(1,9)],
+    #                [(10,0),(9,1),(8,2),(7,3),(6,4),(5,5),(4,6),(3,7),(2,8),(1,9)],
+    #                ] # for migrating files 
     W = [
     [0, 0, 1], 
     [1, 0, 3] ,[0, 1, 3] ,
@@ -64,37 +67,49 @@ def main() :
 
     list_weights = [W15_only_outside]
 
+
     reg = 1. # if reg is not specified here (ie reg = 0), the regularization term will be chosen based on the space size
     niter = 30 # Maximum number of iterations, usually 100 is enough
     tol = 1e-9  # convergence threshold, if the change if below this number between two iteration, it will override niter and stop the computation
     sharpening = False # Whether or not entropic sharpening is used : beware it increases computation time a lot
     verbose = True # Whether or not the computation prints a lot of things. It will anyway only be written in 'output.log' file
-    downsample_ratio = 1
-    thresholded = False
+    downsample_ratio = 1 # Downsample the image 
+    thresholded = False # Whether you want or not the images/shapes to be indicators rather than (x,y,z,intensity)
 
-    linear = True
-    sideBySide = True
-    ResDir = 'Results_2jd8'
-    ResDir = pathlib.Path('.') / ResDir
-    ResDir.mkdir(parents=True, exist_ok=True)
+    linear = True # Also produces the results of Linear interpolation for comparison 
+
+    sideBySide = True # If linear, also saves OT and linear interpolation as side by side matrix for vizualisation (doesnt create directory)
+    
+    ResDir = 'Results_2jd8' # Main result directory 
+    ########## Builds Dir ##########
     if thresholded : 
         ResDir = ResDir+'thresholded'
+    ResDir = pathlib.Path('.') / ResDir
+    ResDir.mkdir(parents=True, exist_ok=True)
+
+    ###### SubDirectory depending on regularisation term value ####
     SubResDir = str(reg)
     SubResDir = pathlib.Path('.') / ResDir / SubResDir
-    print(SubResDir)
     SubResDir.mkdir(parents = True, exist_ok = True)
+
+
+    ###### TRIES TO DOWNLOAD STRUCTURE FROM EMDB DATABASE ##########
     all_structures = np.array(list_structures).flatten()
     for structure in all_structures : 
         download_structure(structure)
 
     counter = 0 #here to name the structure in 'chronological' order
 
-
+    ##### Directory to save Linear interpolations 
     if linear : 
         
         LinearDir = pathlib.Path('.') / ResDir / 'Linear'
         LinearDir.mkdir(parents = True, exist_ok = True)
 
+
+
+    ###################################################################
+    ############ Main computations
 
     for i,tuple_structures in enumerate(list_structures) : 
         ### getting structures  in Hv 
@@ -175,10 +190,12 @@ def main() :
                     print('the maps do not have the same shape, break')
                     break
                 
+                ##################################################
                 barycenter = convolutional_barycenter(Hv, reg, tuple_weights, niter = niter, tol = tol, sharpening = sharpening, verbose = verbose) 
-                
+                ##################################################
+
                 if not save_as_im : 
-                    
+                    # If we are not dealing with a 2D array/Image, then save the result as mrc 
                     with mrcfile.new(result_file) as mrc:
                     
                         print(barycenter.dtype)
