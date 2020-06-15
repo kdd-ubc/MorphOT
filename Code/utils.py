@@ -3,12 +3,13 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 from scipy.optimize import newton
 import multiprocessing as mp
 import time
+import sys
 try : 
     import cupy as cp
 except : 
     pass
 
-#import mrcfile
+import mrcfile
 
 
 ###################################################################################################################################
@@ -46,11 +47,69 @@ def compute_from_shape_names(list_shape_names,N, weights):
     return barycenter
 
     
+    
+###################################################################################################################################
+###################################################################################################################################
+################################## MAIN TRANSPORT MAPS FUNCTIONS ##################################################################
+###################################################################################################################################
+###################################################################################################################################
+
+def sinkhorn(mu0, mu1, reg, stabThresh = 1e-30, niter = 100) : 
+    
+    def K(x):
+        
+        return gaussian_filter(x,sigma=reg)
+    
+    
+    mu0 = mu0 / mu0.sum()
+    mu1 = mu1 / mu1.sum()
+    
+    if mu0.shape != mu1.shape :
+        raise ValueError('Shapes are not the same')
+    
+    v = np.ones(mu0.shape)
+    w = np.ones(mu1.shape)
+    
+    for i in range(niter):
+        v = mu0 / np.maximum(stabThresh,K(w) )
+        w = mu1 / np.maximum(stabThresh,K(v) ) 
+        
+        
+    
+    return v,w
+    
+
+
 ###################################################################################################################################
 ###################################################################################################################################
 ################################## MAIN BARYCENTER FUNCTIONS ######################################################################
 ###################################################################################################################################
 ###################################################################################################################################
+
+# ----------------------------------------------------------------------------
+#
+def linear_barycenter(Hv,alpha):
+    """[summary]
+
+    Args:
+        Hv {(ndarray)} -- Set of distributions 
+        alpha {list} -- set of weights
+
+    Raises:
+        MemoryError: [description]
+
+    Returns:
+        ndarray -- solution of weighted wassertein barycenter problem
+    """
+    for i in range(len(Hv)):
+        Hv[i] = (Hv[i]-Hv[i].min())/Hv[i].sum()
+
+    bary = np.empty(Hv[0].shape)
+    for i in range(len(Hv)) :
+        bary += alpha[i]*Hv[i]
+
+    return bary
+    
 
 # ----------------------------------------------------------------------------
 #
@@ -74,13 +133,11 @@ def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,s
     """
     try : 
         import cupy
-        #print('cupy is here, running on gpu')
         is_gpu = True
     except :
-        #print('cupy not installed / no cuda GPU on computer, running on cpu')
+        print('cupy not installed / no cuda GPU on computer, running on cpu')
         is_gpu = False 
         
-    #print(alpha)
     if is_gpu :
         return convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh,niter,tol,sharpening, verbose)
     else : 
@@ -130,6 +187,7 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
     barycenter = np.zeros(Hv[0].shape)
     
     change = 1
+    
     for j in range(niter):
         t0 = time.time()
         barycenterOld = barycenter
@@ -167,7 +225,7 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
         if change<tol :
             break
 
-    return barycenter*mean_weights
+    return barycenter
 
 # ----------------------------------------------------------------------------
 #
@@ -239,12 +297,12 @@ def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, t
         
 
         if verbose :
+            #sys.stdout('output.log','a')
             print("iter : ",j , "change : ", change, 'time :', time.time()-t0)
         if change<tol :
             break
-    
-    
-    return cp.asnumpy(barycenter*mean_weights)
+
+    return cp.asnumpy(barycenter)
 
 
 
@@ -393,9 +451,9 @@ def load_volume(N,shape):
             
             
         elif shape == 'cubes':
-            r = .15
-            c1 = np.array([.5, .5, .25])
-            c2 = np.array([.5, .5, .75])
+            r = .225
+            c1 = np.array([.5, .5, .225])
+            c2 = np.array([.5, .5, .775])
             cube1 = (abs(xc-c1[0]) < r) & (abs(yc-c1[1]) < r) & (abs(zc-c1[2]) < r)
             cube2 = (abs(xc-c2[0]) < r) & (abs(yc-c2[1]) < r) & (abs(zc-c2[2]) < r)
             res_shape = cube1 + cube2

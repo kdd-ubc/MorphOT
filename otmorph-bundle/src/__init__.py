@@ -1,7 +1,7 @@
 # vim: set expandtab shiftwidth=4 softtabstop=4:
 
 from chimerax.core.toolshed import BundleAPI
-from chimerax.core.commands import FloatArg, FloatsArg, CmdDesc, register, BoolArg, StringArg, EnumOf, IntArg, Int3Arg, ModelIdArg
+from chimerax.core.commands import FloatArg, FloatsArg, CmdDesc, register, BoolArg, StringArg, EnumOf, IntArg, Int3Arg, ModelIdArg, SaveFolderNameArg
 from chimerax.map import MapsArg, MapStepArg, Float1or3Arg, ValueTypeArg
 from chimerax.map.mapargs import Float2Arg, MapRegionArg
 # Subclass from chimerax.core.toolshed.BundleAPI and
@@ -69,6 +69,20 @@ class _MyAPI(BundleAPI):
                                             ('interpolate_colors', BoolArg)] + ssm_kw,
                                 synopsis = 'OT barycenter maps')
             register(ci.name, onebarycenter_desc, func)
+
+        if ci.name == 'volumeperso barycenterSave' : 
+            from . import morph
+            from . import cmd 
+            func = cmd.volume_barycenterSave
+            varg = cmd.varg 
+            ssm_kw = cmd.ssm_kw 
+            savebarycenter_desc = CmdDesc(required = varg + [('folder', SaveFolderNameArg)],
+                                keyword = [('frames', IntArg),
+                                            ('niter', IntArg),
+                                            ('reg', FloatArg),
+                                            ('interpolate_colors', BoolArg)] + ssm_kw,
+                                synopsis = 'OT barycenter maps')
+            register(ci.name, savebarycenter_desc, func)
 
         
     

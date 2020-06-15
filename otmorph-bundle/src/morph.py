@@ -15,7 +15,7 @@ class Interpolated_Map:
 
   def __init__(self, volumes, scale_factors = None, adjust_thresholds = False,
                add_mode = False, interpolate_colors = True,
-               subregion = 'all', step = 1, model_id = None):
+               subregion = 'all', step = 1, model_id = None, niter = 20, reg = None):
 
     self.volumes = volumes
     v0 = volumes[0]
@@ -52,6 +52,8 @@ class Interpolated_Map:
     self.step_direction = 1     # 1 or -1, current direction when looping
     self.recording = False
 
+    self.niter = niter
+    self.reg = reg
     self.adjust_thresholds = adjust_thresholds
     self.surface_level_ranks = []       # For avoiding creep during threshold
     self.image_level_ranks = []         #   normalization.
@@ -69,7 +71,9 @@ class Interpolated_Map:
     if v.data is None or v1.data is None or v2.data is None:
       return False
 
-    ot_combination(sf1, v1, sf2, v2, v, self.subregion, self.step)
+    
+
+    ot_combination(sf1, v1, sf2, v2, v, self.subregion, self.step, self.niter, self.reg)
     self.f = f
 
     if self.adjust_thresholds:
@@ -247,14 +251,14 @@ def interpolate_colors(f1, v1, f2, v2, v):
 
 def morph_maps_ot(volumes, play_steps, play_start, play_step, play_direction,
                play_range, add_mode, adjust_thresholds, scale_factors,
-               hide_maps, interpolate_colors, subregion, step, model_id):
+               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg):
 
   if hide_maps:
     for v in volumes:
       v.display = False
 
   im = Interpolated_Map(volumes, scale_factors, adjust_thresholds, add_mode,
-                        interpolate_colors, subregion, step, model_id)
+                        interpolate_colors, subregion, step, model_id, niter, reg)
   if play_steps > 0:
     fmin, fmax = play_range
     im.play_ot(play_start, fmin, fmax, play_step, None, play_direction, play_steps)
@@ -264,14 +268,14 @@ def morph_maps_ot(volumes, play_steps, play_start, play_step, play_direction,
   return im
 
 
-def ot_combination(f1, v1, f2, v2, v, subregion, step):
+def ot_combination(f1, v1, f2, v2, v, subregion, step, niter, reg):
   
   m = v.full_matrix()
   m1 = v1.matrix(step = step, subregion = subregion)
   m2 = v2.matrix(step = step, subregion = subregion)
-  from .help_functions import convolutional_barycenter
+  from .utils import convolutional_barycenter
   #m[:,:,:] = f1*m1[:,:,:] + f2*m2[:,:,:]
-  m[:,:,:] = convolutional_barycenter([m1,m2],0.8,(f1,f2),niter=20,verbose=False)
+  m[:,:,:] = convolutional_barycenter([m1,m2],reg,(f1,f2),niter=niter,verbose=False)
   v.data.values_changed()
 
 
@@ -282,20 +286,18 @@ def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, mod
   m1 = v1.matrix(step = step, subregion = subregion)
   m2 = v2.matrix(step = step, subregion = subregion)
 
-  print(m1.sum(),m2.sum())
+  
   alpha = (weights[0],weights[1])
-  #region = v1.subregion(step, subregion)
-  #origin, step = v1.region_origin_and_step(region)
 
   
   r = v1.writable_copy(require_copy = True, copy_colors = False,
                            unshow_original = False,
                            subregion = subregion, step = step,
-                           model_id = model_id, name = '%s %s weights %s'%(v1.name,v2.))
+                           model_id = model_id, name = '%s %s weights %s'%(v1.name,v2.name, str(alpha)))
 
   m = r.full_matrix()
 
-  from .help_functions import convolutional_barycenter
+  from .utils import convolutional_barycenter
   m[:,:,:] = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
 
   #from chimerax.map.data import ArrayGridData
@@ -307,3 +309,84 @@ def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, mod
                     # name = name)
   r.data.values_changed()
   return r
+
+
+def ot_save(volumes, dir_name, frames, niter, reg, subregion='all', step = 1, model_id = None) : 
+  v1 = volumes[0]
+  v2 = volumes[1]
+
+  m1 = v1.matrix(step = step, subregion = subregion)
+  m2 = v2.matrix(step = step, subregion = subregion)
+
+  from .utils import convolutional_barycenter
+  import mrcfile 
+  import progressbar
+
+  all_weights = [(float(s)/frames,1-float(s)/frames) for s in range(frames)]
+
+  #for weights in progressbar.progressbar(all_weights, redirect_stdout=True) : 
+  for i,weights in enumerate(all_weights): 
+    print('(%i of %i)'%(i,frames))
+
+    result_file = dir_name + '/%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
+
+    m = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
+    from chimerax.map.data import ArrayGridData
+    from chimerax.map.data.mrc import save
+
+    m_grid = ArrayGridData(m)
+
+    save(m_grid, result_file)
+
+  
+
+
+
+def rateLinear(frames):
+        "Generate fractions from 0 to 1 linearly (excluding start/end)"
+        return [ float(s) / frames for s in range(1, frames) ]
+
+def rateSinusoidal(frames):
+        """Generate fractions from 0 to 1 sinusoidally
+        (slow at beginning, fast in middle, slow at end)"""
+        import math
+        piOverTwo = math.pi / 2
+        rate = []
+        for s in rateLinear(frames):
+                a = math.pi + s * math.pi
+                v = math.cos(a)
+                r = (v + 1) / 2
+                rate.append(r)
+        return rate
+
+def rateRampUp(frames):
+        """Generate fractions from 0 to 1 sinusoidally
+        (slow at beginning, fast at end)"""
+        import math
+        piOverTwo = math.pi / 2
+        rate = []
+        for s in rateLinear(frames):
+                a = math.pi + s * piOverTwo
+                v = math.cos(a)
+                r = v + 1
+                rate.append(r)
+        return rate
+
+def rateRampDown(frames):
+        """Generate fractions from 0 to 1 sinusoidally
+        (fast at beginning, slow at end)"""
+        import math
+        piOverTwo = math.pi / 2
+        rate = []
+        for s in rateLinear(frames):
+                a = s * piOverTwo
+                r = math.sin(a)
+                rate.append(r)
+        return rate
+
+RateMap = {
+        "linear": rateLinear,
+        "sinusoidal": rateSinusoidal,
+        "ramp up": rateRampUp,
+        "ramp down": rateRampDown,
+}

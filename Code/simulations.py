@@ -1,7 +1,7 @@
 import numpy as np
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__)))
-from help_functions import *
+from utils import *
 import pylab as pl
 import mrcfile 
 import pathlib
@@ -15,12 +15,12 @@ def main() :
     # -------------------
     # Tuples of set of structure you want to get barycenters from, please include file format
     #list_structures = [('emd_4121.map.gz','emd_4122.map.gz','emd_4123.map.gz'),('2jd8_01.mrc','2jd8_012.mrc','2jd8_020.mrc')]
-    #list_structures = [('2jd8_01.mrc','2jd8_012.mrc','2jd8_020.mrc')]
+    list_structures = [('2jd8_01.mrc','2jd8_012.mrc','2jd8_020.mrc')]
     #list_structures = [('emd_4121.map.gz','emd_4122.map.gz','emd_4123.map.gz')]
-    list_structures = [('migrating_t0.jpg','migrating_t4.jpg'),
-                        ('migrating_t4.jpg','migrating_t9.jpg'),
-                        ('migrating_t9.jpg','migrating_t15.jpg'),
-                        ]
+    #list_structures = [('migrating_t0.jpg','migrating_t4.jpg'),
+    #                    ('migrating_t4.jpg','migrating_t9.jpg'),
+    #                    ('migrating_t9.jpg','migrating_t15.jpg'),
+    #                    ]
 
 
     # -------------------
@@ -62,26 +62,39 @@ def main() :
                     (12,0,3),(13,0,2),(14,0,1),(15,0,0),]
 
 
-    #list_weights = [W6]
+    list_weights = [W15_only_outside]
 
-    reg = 22 # if reg is not specified here (ie reg = 0), the regularization term will be chosen based on the space size
+    reg = 1. # if reg is not specified here (ie reg = 0), the regularization term will be chosen based on the space size
     niter = 30 # Maximum number of iterations, usually 100 is enough
     tol = 1e-9  # convergence threshold, if the change if below this number between two iteration, it will override niter and stop the computation
     sharpening = False # Whether or not entropic sharpening is used : beware it increases computation time a lot
     verbose = True # Whether or not the computation prints a lot of things. It will anyway only be written in 'output.log' file
-
     downsample_ratio = 1
-
     thresholded = False
-    ResDir = 'Results_migrating'
+
+    linear = True
+    sideBySide = True
+    ResDir = 'Results_2jd8'
+    ResDir = pathlib.Path('.') / ResDir
+    ResDir.mkdir(parents=True, exist_ok=True)
     if thresholded : 
         ResDir = ResDir+'thresholded'
     SubResDir = str(reg)
+    SubResDir = pathlib.Path('.') / ResDir / SubResDir
+    print(SubResDir)
+    SubResDir.mkdir(parents = True, exist_ok = True)
     all_structures = np.array(list_structures).flatten()
     for structure in all_structures : 
         download_structure(structure)
 
     counter = 0 #here to name the structure in 'chronological' order
+
+
+    if linear : 
+        
+        LinearDir = pathlib.Path('.') / ResDir / 'Linear'
+        LinearDir.mkdir(parents = True, exist_ok = True)
+
 
     for i,tuple_structures in enumerate(list_structures) : 
         ### getting structures  in Hv 
@@ -121,19 +134,36 @@ def main() :
             results_directory = pathlib.Path('.') / 'Results' 
             results_directory.mkdir(parents=True, exist_ok=True)
 
+            if linear : 
+                if not save_as_im:
+                    result_file_linear = pathlib.Path('.')/('%s'%LinearDir) / ('%s_%s.mrc'%(main_dict_key,weights_key))
+                else : 
+                    result_file_linear = pathlib.Path('.')/('%s'%LinearDir) / ('%s_%s.jpg'%(main_dict_key,weights_key))
+
+                linear_bary = linear_barycenter(Hv,tuple_weights).astype('float32')
+                
+                if not save_as_im : 
+                    with mrcfile.new(result_file_linear, overwrite = True) as mrc :
+                        mrc.set_data(linear_bary)
+                else :
+                     pl.imsave(result_file_linear, linear_bary,cmap = 'Greys_r')
+
+
             if not save_as_im : 
                 if  counter<10 : 
                     result_file = pathlib.Path('.') / ('%s'%ResDir)/('r00%i_%s_%s_%s_%s_sharpen%s.mrc'%(counter,main_dict_key,weights_key,str(Hv[0].shape),str(tol),str(sharpening)))
+            
                 else : 
                     result_file = pathlib.Path('.') / ('%s'%ResDir)/('r0%i_%s_%s_%s_%s_sharpen%s.mrc'%(counter,main_dict_key,weights_key,str(Hv[0].shape),str(tol),str(sharpening)))
 
             else : 
                 if counter<10 : 
-                    result_file = pathlib.Path('.') / ('%s'%ResDir)/('%s'%SubResDir)/('r00%i_%s_%s_%s_%s_sharpen%s.jpg'%(counter,main_dict_key,weights_key,str(Hv[0].shape),str(tol),str(sharpening)))
+                    result_file = pathlib.Path('.') /('%s'%SubResDir)/('r00%i_%s_%s_%s_%s_sharpen%s.jpg'%(counter,main_dict_key,weights_key,str(Hv[0].shape),str(tol),str(sharpening)))
                 else : 
-                    result_file = pathlib.Path('.') / ('%s'%ResDir)/('%s'%SubResDir)/('r0%i_%s_%s_%s_%s_sharpen%s.jpg'%(counter,main_dict_key,weights_key,str(Hv[0].shape),str(tol),str(sharpening)))
+                    result_file = pathlib.Path('.') /('%s'%SubResDir)/('r0%i_%s_%s_%s_%s_sharpen%s.jpg'%(counter,main_dict_key,weights_key,str(Hv[0].shape),str(tol),str(sharpening)))
 
             counter +=1
+
             if not reg : 
                 reg = max(Hv[0].shape)/40
 
@@ -146,16 +176,34 @@ def main() :
                     break
                 
                 barycenter = convolutional_barycenter(Hv, reg, tuple_weights, niter = niter, tol = tol, sharpening = sharpening, verbose = verbose) 
-
+                
                 if not save_as_im : 
-
+                    
                     with mrcfile.new(result_file) as mrc:
                     
                         print(barycenter.dtype)
                         mrc.set_data(barycenter)
+                    
+                    if linear and sideBySide : 
+                        full_bary = np.hstack((linear_bary/linear_bary.sum(),barycenter/barycenter.sum())) 
+                        with mrcfile.new('./SideBySide/sbs_%s_%s.mrc'%(main_dict_key,weights_key),overwrite = True) as mrc:
+                            mrc.set_data(full_bary)
+
+                    
+    
                 else : 
 
                     pl.imsave(result_file,barycenter,cmap='Greys_r')
+
+                    if linear and sideBySide :
+                        full_bary = np.hstack((linear_bary/linear_bary.sum(),barycenter/barycenter.sum())) 
+                        pl.imsave('./SideBySide/sbs_%s_%s.jpg'%(main_dict_key,weights_key), full_bary, cmap='Greys_r')
+
+            
+            
+            
+        
+
 
     # ------------------------------------------------------------------------------------------------------------------------
     #

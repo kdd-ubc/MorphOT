@@ -1,2 +1,4 @@
 ChimeraX-Core>=0.1
 ChimeraX-Map>=0.1
+mrcfile>=0.1
+progressbar2>=0.1
