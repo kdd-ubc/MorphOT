@@ -15,7 +15,7 @@ class Interpolated_Map:
 
   def __init__(self, volumes, scale_factors = None, adjust_thresholds = False,
                add_mode = False, interpolate_colors = True,
-               subregion = 'all', step = 1, model_id = None, niter = 20, reg = None):
+               subregion = 'all', step = 1, model_id = None, niter = 20, reg = None, rate = 'linear'):
 
     self.volumes = volumes
     v0 = volumes[0]
@@ -54,6 +54,7 @@ class Interpolated_Map:
 
     self.niter = niter
     self.reg = reg
+    self.rate = rate
     self.adjust_thresholds = adjust_thresholds
     self.surface_level_ranks = []       # For avoiding creep during threshold
     self.image_level_ranks = []         #   normalization.
@@ -67,7 +68,9 @@ class Interpolated_Map:
     if self.adjust_thresholds:
       self.record_threshold_ranks(v)
 
-    f1, f2, sf1, sf2, v1, v2 = self.coefficients(f)
+    changed_f = get_weights(self.rate,f)
+    #f1, f2, sf1, sf2, v1, v2 = self.coefficients(f)
+    f1, f2, sf1, sf2, v1, v2 = self.coefficients(changed_f)
     if v.data is None or v1.data is None or v2.data is None:
       return False
 
@@ -151,6 +154,7 @@ class Interpolated_Map:
 
     fmin, fmax = self.fmin, self.fmax
     next_f = self.f + self.fstep * self.step_direction
+
     if next_f >= fmax:
       next_f = fmax
       self.step_direction = -1
@@ -162,6 +166,7 @@ class Interpolated_Map:
     fccb = self.f_changed_cb
     if fccb:
       fccb(self.f)
+  """
   # ---------------------------------------------------------------------------
   #
   def record(self, fmin, fmax, fstep, f_changed_cb, roundtrip, record_args, save_movie_cb):
@@ -200,6 +205,7 @@ class Interpolated_Map:
     runCommand(self.session, 'movie stop')
 
     self.save_movie_cb()
+"""
 
   # ---------------------------------------------------------------------------
   #
@@ -251,14 +257,14 @@ def interpolate_colors(f1, v1, f2, v2, v):
 
 def morph_maps_ot(volumes, play_steps, play_start, play_step, play_direction,
                play_range, add_mode, adjust_thresholds, scale_factors,
-               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg):
+               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate):
 
   if hide_maps:
     for v in volumes:
       v.display = False
 
   im = Interpolated_Map(volumes, scale_factors, adjust_thresholds, add_mode,
-                        interpolate_colors, subregion, step, model_id, niter, reg)
+                        interpolate_colors, subregion, step, model_id, niter, reg, rate)
   if play_steps > 0:
     fmin, fmax = play_range
     im.play_ot(play_start, fmin, fmax, play_step, None, play_direction, play_steps)
@@ -273,7 +279,7 @@ def ot_combination(f1, v1, f2, v2, v, subregion, step, niter, reg):
   m = v.full_matrix()
   m1 = v1.matrix(step = step, subregion = subregion)
   m2 = v2.matrix(step = step, subregion = subregion)
-  from .help_functions import convolutional_barycenter
+  from .utils import convolutional_barycenter
   #m[:,:,:] = f1*m1[:,:,:] + f2*m2[:,:,:]
   m[:,:,:] = convolutional_barycenter([m1,m2],reg,(f1,f2),niter=niter,verbose=False)
   v.data.values_changed()
@@ -297,7 +303,7 @@ def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, mod
 
   m = r.full_matrix()
 
-  from .help_functions import convolutional_barycenter
+  from .utils import convolutional_barycenter
   m[:,:,:] = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
 
   #from chimerax.map.data import ArrayGridData
@@ -311,19 +317,22 @@ def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, mod
   return r
 
 
-def ot_save(volumes, dir_name, frames, niter, reg, subregion='all', step = 1, model_id = None) : 
+def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step = 1, model_id = None) : 
   v1 = volumes[0]
   v2 = volumes[1]
 
   m1 = v1.matrix(step = step, subregion = subregion)
   m2 = v2.matrix(step = step, subregion = subregion)
 
-  from .help_functions import convolutional_barycenter
+  from .utils import convolutional_barycenter
   import mrcfile 
   import progressbar
 
-  all_weights = [(float(s)/frames,1-float(s)/frames) for s in range(frames)]
+  rate_function = RateMap[rate.lower()]
 
+  all_weights = rate_function(frames)
+  all_weights = [(round(i,6),round(1-i,6)) for i in all_weights]
+  print(all_weights)
   #for weights in progressbar.progressbar(all_weights, redirect_stdout=True) : 
   for i,weights in enumerate(all_weights): 
     print('(%i of %i)'%(i,frames))
@@ -339,7 +348,24 @@ def ot_save(volumes, dir_name, frames, niter, reg, subregion='all', step = 1, mo
     save(m_grid, result_file)
 
   
+def get_weights(rate, f):
+  import math
+  s = f
+  if rate.lower() == 'linear' : 
+    return f
 
+  elif (rate.lower() == 'sinus') or (rate.lower() == 'sinusoidal') : 
+    return (math.cos(math.pi +f*math.pi)+1)/2.
+
+  elif (rate.lower() == 'rampup') or (rate.lower() == 'ramp up') : 
+    return (math.cos( math.pi + f * math.pi / 2. ) + 1)
+  
+  elif (rate.lower() == 'rampdown') or (rate.lower() == 'ramp down') :
+    return (math.sin( f * math.pi/2))
+
+  else : 
+    raise ValueError('rate not recognized, expected a string in ["linear","sinus","ramp up","ramp down"]') 
+ 
 
 
 def rateLinear(frames):

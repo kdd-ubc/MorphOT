@@ -4,7 +4,7 @@ from chimerax.map.mapargs import Float2Arg, MapRegionArg
 from chimerax.core.errors import UserError as CommandError
 
 def volume_morphOT(session, volumes, frames = 25, start = 0, play_step = 0.04,
-            play_direction = 1, niter = 20, reg = None,  play_range = None, add_mode = False,
+            play_direction = 1, niter = 20, reg = None, rate = 'linear',  play_range = None, add_mode = False,
             constant_volume = False, scale_factors = None,
             hide_original_maps = True, interpolate_colors = True,
             subregion = 'all', step = 1, model_id = None):
@@ -34,7 +34,7 @@ def volume_morphOT(session, volumes, frames = 25, start = 0, play_step = 0.04,
     from .morph import morph_maps_ot
     im = morph_maps_ot(volumes, frames, start, play_step, play_direction, prange,
                     add_mode, constant_volume, scale_factors,
-                    hide_original_maps, interpolate_colors, subregion, step, model_id, niter, reg)
+                    hide_original_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate)
     return im
 
 
@@ -61,7 +61,7 @@ def volume_barycenterOT(session, volumes, weights, niter = 20, reg = None, inter
 
 
 
-def volume_barycenterSave(session, volumes, folder, frames = 25, niter = 20, reg = None, interpolate_colors = True,
+def volume_barycenterSave(session, volumes, folder, frames = 25, niter = 20, reg = None, rate = 'Linear', interpolate_colors = True,
             subregion = 'all', step = 1, model_id = None):
     '''OT interpolate between maps.'''
     if len(volumes) < 2:
@@ -80,7 +80,7 @@ def volume_barycenterSave(session, volumes, folder, frames = 25, niter = 20, reg
 
     from .morph import ot_save
 
-    ot_save(volumes, folder, frames, niter, reg, subregion, step, model_id)
+    ot_save(volumes, folder, frames, niter, reg, rate, subregion, step, model_id)
 
 
 

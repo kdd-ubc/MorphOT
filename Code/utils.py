@@ -77,9 +77,37 @@ def sinkhorn(mu0, mu1, reg, stabThresh = 1e-30, niter = 100) :
         
     
     return v,w
+
+
     
 
-
+def wasserstein_distance(mu0, mu1, reg, stabThresh = 1e-30, niter = 100) : 
+    
+    def K(x):
+        
+        return gaussian_filter(x,sigma=reg)
+    
+    
+    mu0 = mu0 / mu0.sum()
+    mu1 = mu1 / mu1.sum()
+    area_weights = np.ones(mu0.shape)/mu0.size
+    if mu0.shape != mu1.shape :
+        raise ValueError('Shapes are not the same')
+    
+    v = np.ones(mu0.shape)
+    w = np.ones(mu1.shape)
+    
+    for i in range(niter):
+        v = mu0 / np.maximum(stabThresh,K(w) )
+        w = mu1 / np.maximum(stabThresh,K(v) ) 
+        
+        
+    
+    # return reg * (mu0*np.log(np.maximum(v,1e-30)) + mu1*np.log(np.maximum(w,1e-30))).mean()
+    # Not using the above formula because the regularization term is a function of the 
+    # parameter in gaussian blurr, we don't precisely know what it is so we use a 
+    # formula only based on the gaussian blurr
+    return (v*np.log(np.maximum(v,1e-60))*K(w) + v * K(w*np.log(np.maximum(w,1e-60)))).mean()
 ###################################################################################################################################
 ###################################################################################################################################
 ################################## MAIN BARYCENTER FUNCTIONS ######################################################################
@@ -196,7 +224,7 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
         for i in range(Hv.shape[0]):
 
             
-            Kw[i,:,:] = K(Hv[i,:,:] / np.maximum(stabThresh,K(v[i,:,:])) )
+            Kw[i,:,:] = K(Hv[i,:,:] / np.maximum(stabThresh,K(v[i, :, :])) )
             
             
             barycenter += alpha[i] * np.log(np.maximum(stabThresh, v[i, :, :]*Kw[i, :, :]))
@@ -496,7 +524,7 @@ def load_volume(N,shape):
             
         
         
-        return (x,y,z),res_shape
+        return res_shape
     
 # ----------------------------------------------------------------------------
 #
@@ -514,104 +542,3 @@ def midpoints(x):
 def normalize(array):
     return array/array.sum()
 
-####################################################################################################################################################
-####################################################################################################################################################
-################################# GAUSSIAN FILTER WITHOUT SCIPY (BASED ON VOLUME FILTER EXTENXION CHIMERA)##########################################
-####################################################################################################################################################
-####################################################################################################################################################
-
-
-# ----------------------------------------------------------------------------
-#
-def ceil_power_of_2(n):
-    """[summary]
-
-    Arguments:
-        n {integer} -- power of 2
-
-    Returns:
-        {integer} -- 2 to the power of n
-    """
-    p = 1
-    while n > p:
-        p *= 2
-    return p
-
-# ----------------------------------------------------------------------------
-#
-def gaussian(sdev, size, value_type):
-
-    from math import exp
-    from numpy import empty, add, divide
-
-    g = empty((size,), value_type)
-    for i in range(size):
-        u = min(i,size-i) / sdev
-        p = min(u*u/2, 100)               # avoid OverflowError with exp()
-        g[i] = exp(-p)
-    area = add.reduce(g)
-    divide(g, area, g)
-    return g
-
-# ----------------------------------------------------------------------------
-#
-fast_fft_sizes = [2, 3, 4, 5, 6, 8, 9, 10, 12, 16, 18, 20, 21, 25, 32, 33, 36, 40, 48, 50, 54, 55, 64, 65, 72, 80, 81, 90, 96, 100, 108, 120, 128, 144, 150, 160, 162, 180, 192, 200, 216, 256, 270, 300, 320, 324, 325, 336, 360, 400, 432, 450, 480, 500, 512, 540, 576, 600, 640, 648, 720, 750, 800, 810, 864, 900, 960, 1024, 1080, 1152, 1200, 1280, 1296, 1350, 1440, 1500, 1536, 1600, 1620, 1728, 1800, 1920, 2048, 2160, 2250, 2304, 2400, 2560, 2700, 2880, 3000, 3072, 3200, 3240, 3600, 3840, 4096, 4160, 4176, 4180, 4186, 4187, 4192]
-def efficient_fft_size(n):
-
-    if n < fast_fft_sizes[-1]:
-        from bisect import bisect
-        b = bisect(fast_fft_sizes, n)
-        s = fast_fft_sizes[b]
-    else:
-        s = ceil_power_of_2(n)
-    return s
-
-# ----------------------------------------------------------------------------
-# Compute with zero padding in real-space to avoid cyclic-convolution.
-#
-def gaussian_convolution(data, ijk_sdev, value_type = None,
-                         cyclic = False, cutoff = 5, invert = False, task = None):
-
-    if value_type is None:
-        value_type = data.dtype
-      
-    from numpy import array, float32, float64, multiply, divide, swapaxes
-    vt = value_type if value_type == float32 or value_type == float64 else float32
-    c = array(data, vt)
-      
-    from numpy.fft import rfft, irfft
-    for axis in range(3):           # Transform one axis at a time.
-        size = c.shape[axis]
-        if size == 1:
-            continue          # For a plane don't try to filter normal to plane.
-        sdev = ijk_sdev[2-axis]       # Axes i,j,k are 2,1,0.
-        hw = min(size/2, int(cutoff*sdev+1)) if cutoff else size/2
-        nzeros = 0 if cyclic else hw  # Zero-fill for non-cyclic convolution.
-        if nzeros > 0:
-            # FFT performance is much better (up to 10x faster in numpy 1.2.1)
-            # than other sizes.
-            nzeros = efficient_fft_size(size + nzeros) - size
-        g = gaussian(sdev, size + nzeros, vt)
-        g[hw:-hw] = 0
-        fg = rfft(g)                  # Fourier transform of 1-d gaussian.
-        cs = swapaxes(c, axis, 2)     # Make axis 2 the FT axis.
-        s0 = cs.shape[0]
-        for p in range(s0):  # Transform one plane at a time.
-            cp = cs[p,...]
-            try:
-                ft = rfft(cp, n=len(g))   # Complex128 result, size n/2+1
-            except ValueError:
-                raise MemoryError     # Array dimensions too large.
-            if invert:
-                divide(ft, fg, ft)
-            else:
-                multiply(ft, fg, ft)
-            cp[:,:] = irfft(ft)[:,:size] # Float64 result
-            if task:
-                pct = 100.0 * (axis + float(p)/s0) / 3.0
-                task.updateStatus('%.0f%%' % pct)
-      
-    if value_type != vt:
-        return c.astype(value_type)
-      
-    return c

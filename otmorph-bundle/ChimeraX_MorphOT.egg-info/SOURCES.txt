@@ -5,5 +5,5 @@ ChimeraX_MorphOT.egg-info/requires.txt
 ChimeraX_MorphOT.egg-info/top_level.txt
 src/__init__.py
 src/cmd.py
-src/help_functions.py
 src/morph.py
+src/utils.py

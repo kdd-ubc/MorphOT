@@ -45,14 +45,15 @@ class _MyAPI(BundleAPI):
                                         ('start', FloatArg),
                                         ('play_step', FloatArg),
                                         ('play_direction', IntArg),
+                                        ('niter', IntArg),
+                                        ('reg', FloatArg),
                                         ('play_range', Float2Arg),
                                         ('add_mode', BoolArg),
                                         ('constant_volume', BoolArg),
                                         ('scale_factors', FloatsArg),
                                         ('hide_original_maps', BoolArg),
-                                        ('interpolate_colors', BoolArg),
-                                        ('reg', FloatArg),
-                                        ('niter',IntArg)] + ssm_kw,
+                                        ('rate', StringArg),
+                                        ('interpolate_colors', BoolArg),] + ssm_kw,
                             synopsis = 'OT interpolate maps')
             register(ci.name, morphot_desc, func)
 
@@ -67,7 +68,7 @@ class _MyAPI(BundleAPI):
                                             ('niter', IntArg),
                                             ('reg', FloatArg),
                                             ('interpolate_colors', BoolArg)] + ssm_kw,
-                                synopsis = 'OT barycenter maps')
+                                synopsis = 'does one OT barycenter')
             register(ci.name, onebarycenter_desc, func)
 
         if ci.name == 'volumeperso barycenterSave' : 
@@ -80,8 +81,9 @@ class _MyAPI(BundleAPI):
                                 keyword = [('frames', IntArg),
                                             ('niter', IntArg),
                                             ('reg', FloatArg),
-                                            ('interpolate_colors', BoolArg)] + ssm_kw,
-                                synopsis = 'OT barycenter maps')
+                                            ('rate',StringArg),
+                                            ('interpolate_colors', BoolArg),] + ssm_kw,
+                                synopsis = 'save many barycenter maps')
             register(ci.name, savebarycenter_desc, func)
 
         
