@@ -33,6 +33,7 @@ will be displayed without the ChimeraX- prefix.
     <Dependency name="ChimeraX-Map" version=">=0.1"/>
     <Dependency name="mrcfile" version=">=0.1"/>
     <Dependency name="progressbar2" version=">=0.1"/>
+    
     <!-- -
     <Dependency name="cupy-cuda102" version=">=0.1"/>
     <!- -->
@@ -58,9 +59,13 @@ will be displayed without the ChimeraX- prefix.
     <!-- ChimeraX classifiers describe supplied functionality -->
     <ChimeraXClassifier>ChimeraX :: Command :: volumeperso morphOT :: General ::
 	Display OT interpolation of volumes</ChimeraXClassifier>
+    <ChimeraXClassifier>ChimeraX :: Command :: volumeperso semimorphOT :: General ::
+	Display OT interpolation of volumes</ChimeraXClassifier>
     <ChimeraXClassifier>ChimeraX :: Command :: volumeperso onebarycenter :: General ::
 	Computes OT bayrcenter of volumes</ChimeraXClassifier>
     <ChimeraXClassifier>ChimeraX :: Command :: volumeperso barycenterSave :: General ::
+    Computes and save OT bayrcenter of volumes</ChimeraXClassifier>
+    <ChimeraXClassifier>ChimeraX :: Command :: volumeperso linearBarycenterSave :: General ::
     Computes and save OT bayrcenter of volumes</ChimeraXClassifier>
   </Classifiers>
 

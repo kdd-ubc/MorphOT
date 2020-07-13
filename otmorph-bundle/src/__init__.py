@@ -53,7 +53,37 @@ class _MyAPI(BundleAPI):
                                         ('scale_factors', FloatsArg),
                                         ('hide_original_maps', BoolArg),
                                         ('rate', StringArg),
-                                        ('interpolate_colors', BoolArg),] + ssm_kw,
+                                        ('interpolate_colors', BoolArg),
+                                        ('maxsize',IntArg),
+                                        ('gaussfilt',BoolArg),
+                                        ('semi',BoolArg)] + ssm_kw,
+                            synopsis = 'OT interpolate maps')
+            register(ci.name, morphot_desc, func)
+
+        if ci.name == 'volumeperso semimorphOT':
+            from . import morph
+            from . import cmd
+            func = cmd.volume_semi_morphOT
+            varg = cmd.varg
+            ssm_kw = cmd.ssm_kw
+            morphot_desc = CmdDesc(required = varg,
+                            keyword = [('frames', IntArg),
+                                        ('ot_frames',IntArg),
+                                        ('start', FloatArg),
+                                        ('play_step', FloatArg),
+                                        ('play_direction', IntArg),
+                                        ('niter', IntArg),
+                                        ('reg', FloatArg),
+                                        ('play_range', Float2Arg),
+                                        ('add_mode', BoolArg),
+                                        ('constant_volume', BoolArg),
+                                        ('scale_factors', FloatsArg),
+                                        ('hide_original_maps', BoolArg),
+                                        ('rate', StringArg),
+                                        ('interpolate_colors', BoolArg),
+                                        ('maxsize',IntArg),
+                                        ('gaussfilt',BoolArg),
+                                        ('precompute',BoolArg)] + ssm_kw,
                             synopsis = 'OT interpolate maps')
             register(ci.name, morphot_desc, func)
 
@@ -67,7 +97,8 @@ class _MyAPI(BundleAPI):
                                 keyword = [
                                             ('niter', IntArg),
                                             ('reg', FloatArg),
-                                            ('interpolate_colors', BoolArg)] + ssm_kw,
+                                            ('interpolate_colors', BoolArg),
+                                            ('maxsize', IntArg)] + ssm_kw,
                                 synopsis = 'does one OT barycenter')
             register(ci.name, onebarycenter_desc, func)
 
@@ -82,8 +113,25 @@ class _MyAPI(BundleAPI):
                                             ('niter', IntArg),
                                             ('reg', FloatArg),
                                             ('rate',StringArg),
-                                            ('interpolate_colors', BoolArg),] + ssm_kw,
+                                            ('interpolate_colors', BoolArg),
+                                            ('maxsize', IntArg)] + ssm_kw,
                                 synopsis = 'save many barycenter maps')
+            register(ci.name, savebarycenter_desc, func)
+
+        if ci.name == 'volumeperso linearBarycenterSave' : 
+            from . import morph
+            from . import cmd 
+            func = cmd.volume_linearBarycenterSave
+            varg = cmd.varg 
+            ssm_kw = cmd.ssm_kw 
+            savebarycenter_desc = CmdDesc(required = varg + [('folder', SaveFolderNameArg)],
+                                keyword = [('frames', IntArg),
+                                            ('niter', IntArg),
+                                            ('reg', FloatArg),
+                                            ('rate',StringArg),
+                                            ('interpolate_colors', BoolArg),
+                                            ('maxsize', IntArg)] + ssm_kw,
+                                synopsis = 'save many linear_barycenter maps')
             register(ci.name, savebarycenter_desc, func)
 
         

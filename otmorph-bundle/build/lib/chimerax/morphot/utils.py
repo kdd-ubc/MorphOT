@@ -54,7 +54,7 @@ def compute_from_shape_names(list_shape_names,N, weights):
 
 # ----------------------------------------------------------------------------
 #
-def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,sharpening=False, verbose = False):
+def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,sharpening=False, verbose = False, force_cpu =False):
     """Calls convolutional barycenter function depending on whether or not cuda gpus are available
 
     Arguments:
@@ -78,6 +78,9 @@ def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,s
         is_gpu = True
     except :
         #print('cupy not installed / no cuda GPU on computer, running on cpu')
+        is_gpu = False 
+    
+    if force_cpu :
         is_gpu = False 
         
     #print(alpha)
@@ -199,10 +202,7 @@ def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, t
     alpha = cp.array(alpha)
     alpha = alpha/alpha.sum()
     Hv = cp.array(Hv)
-    print(Hv.shape)
-    print(alpha.shape)
     mean_weights = (Hv[0].sum()+Hv[1].sum())/2.
-    #print('mean weights', mean_weights)
     for i in range(len(Hv)):
         Hv[i] = Hv[i]/Hv[i].sum()
     v = cp.ones(Hv.shape)
