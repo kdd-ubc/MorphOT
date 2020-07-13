@@ -19,7 +19,7 @@ weights = [s/frames for s in range(frames)]
 weights = [(elm,1-elm) for elm in weights]
 print(weights)
 for cgpu in ['cpu','gpu'] : 
-    for downsample in [3] : 
+    for downsample in [1,2,3] : 
         for niter in [20, 50, 100, 200] : 
             t0 = time.time()
             tmp1 = _3los[::downsample,::downsample,::downsample]
