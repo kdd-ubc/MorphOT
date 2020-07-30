@@ -148,7 +148,7 @@ def volume_barycenterOT(session, volumes, weights, niter = 20, reg = None, inter
 
 
 def volume_barycenterSave(session, volumes, folder, frames = 25, niter = 20, reg = None, rate = 'Linear', interpolate_colors = True,
-            subregion = 'all', step = 1, model_id = None, maxsize = 60):
+            subregion = 'all', step = 1, model_id = None, maxsize = 60, name1 = None, name2 = None):
     '''OT interpolate between maps.'''
     if len(volumes) < 2:
         raise CommandError('volume morph requires 2 or more volumes, got %d' % len(volumes))
@@ -177,7 +177,7 @@ def volume_barycenterSave(session, volumes, folder, frames = 25, niter = 20, reg
 
     from .morph import ot_save
 
-    ot_save(volumes, folder, frames, niter, reg, rate, subregion, step, model_id)
+    ot_save(volumes, folder, frames, niter, reg, rate, subregion, step, model_id, name1, name2)
 
 
 def volume_linearBarycenterSave(session, volumes, folder, frames = 25, niter = 20, reg = None, rate = 'Linear', interpolate_colors = True,

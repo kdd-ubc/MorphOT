@@ -500,8 +500,16 @@ def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step =
   for i,weights in enumerate(all_weights): 
     if i%5 == 0 : 
       print('(%i of %i)'%(i,frames))
-
-    result_file = dir_name + '/ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
+    padding = len(str(frames))+1
+    str_i = str(i)
+    padded_i = str_i.zfill(padding)
+    if name1 == None : 
+      name1 = v1.name
+    if name2 == None : 
+      name2 = v2.name
+    #result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
+    result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(name1,name2, str(weights))
+    #result_file = dir_name + '/ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
     import time
     t0 = time.time()
     m = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)

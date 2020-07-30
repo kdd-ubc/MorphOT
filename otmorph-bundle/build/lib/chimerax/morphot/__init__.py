@@ -114,7 +114,9 @@ class _MyAPI(BundleAPI):
                                             ('reg', FloatArg),
                                             ('rate',StringArg),
                                             ('interpolate_colors', BoolArg),
-                                            ('maxsize', IntArg)] + ssm_kw,
+                                            ('maxsize', IntArg),
+                                            ('name1', StringArg),
+                                            ('name2', StringArg)] + ssm_kw,
                                 synopsis = 'save many barycenter maps')
             register(ci.name, savebarycenter_desc, func)
 

@@ -357,7 +357,7 @@ def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, mod
   return r
 
 
-def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step = 1, model_id = None) : 
+def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step = 1, model_id = None, name1 = None, name2 = None) : 
   v1 = volumes[0]
   v2 = volumes[1]
 
@@ -378,7 +378,12 @@ def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step =
     padding = len(str(frames))+1
     str_i = str(i)
     padded_i = str_i.zfill(padding)
-    result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
+    if name1 == None : 
+      name1 = v1.name
+    if name2 == None : 
+      name2 = v2.name
+    #result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
+    result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(name1,name2, str(weights))
     import time
     t0 = time.time()
     m = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
