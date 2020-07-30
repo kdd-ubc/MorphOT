@@ -25,14 +25,14 @@ Classifier: Operating System :: MacOS :: MacOS X
 Classifier: Operating System :: Microsoft :: Windows :: Windows 10
 Classifier: Operating System :: POSIX :: Linux
 Classifier: ChimeraX :: Bundle :: General :: 1,1 :: chimerax.morphot ::  :: 
-Classifier: ChimeraX :: Command :: volumeperso morphOT :: General ::
+Classifier: ChimeraX :: Command :: MorphOT morphOT :: General ::
 	Display OT interpolation of volumes
-Classifier: ChimeraX :: Command :: volumeperso semimorphOT :: General ::
+Classifier: ChimeraX :: Command :: MorphOT semimorphOT :: General ::
 	Display OT interpolation of volumes
-Classifier: ChimeraX :: Command :: volumeperso onebarycenter :: General ::
+Classifier: ChimeraX :: Command :: MorphOT onebarycenter :: General ::
 	Computes OT bayrcenter of volumes
-Classifier: ChimeraX :: Command :: volumeperso barycenterSave :: General ::
+Classifier: ChimeraX :: Command :: MorphOT barycenterSave :: General ::
     Computes and save OT bayrcenter of volumes
-Classifier: ChimeraX :: Command :: volumeperso linearBarycenterSave :: General ::
+Classifier: ChimeraX :: Command :: MorphOT linearBarycenterSave :: General ::
     Computes and save OT bayrcenter of volumes
 Requires-Python: >= 3.6

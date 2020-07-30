@@ -147,11 +147,11 @@ class Interpolated_Map:
           print('weights change 0 :' , weights0 , 'weights change 1', weights1,  'reg and iter ' , reg, niter)
           if self.last_ot_weight == 0 :
             self.tmp_v1 = v1
-            self.tmp_v2 = convolutional_barycenter_gpu([v1,v2],reg, weights1, niter = niter)
+            self.tmp_v2 = convolutional_barycenter([v1,v2],reg, weights1, niter = niter)
 
           
-          self.tmp_v1 = convolutional_barycenter_cpu([v1,v2],reg, weights0 ,niter = niter)
-          self.tmp_v2 = convolutional_barycenter_cpu([v1,v2],reg, weights1, niter = niter)
+          self.tmp_v1 = convolutional_barycenter([v1,v2],reg, weights0 ,niter = niter)
+          self.tmp_v2 = convolutional_barycenter([v1,v2],reg, weights1, niter = niter)
           print('changing volume took', time.time()-t0)
 
 
@@ -453,7 +453,7 @@ def ot_combination(f1, v1, f2, v2, v, subregion, step, niter, reg):
   from .utils import convolutional_barycenter, convolutional_barycenter_cpu, convolutional_barycenter_gpu
   import time 
   t0 = time.time()
-  m[:,:,:] = convolutional_barycenter_gpu([m1,m2],reg,(f1,f2),niter=niter,verbose=False)
+  m[:,:,:] = convolutional_barycenter([m1,m2],reg,(f1,f2),niter=niter,verbose=False)
   print(time.time()-t0)
   v.data.values_changed()
 
