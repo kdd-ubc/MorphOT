@@ -34,7 +34,7 @@ class _MyAPI(BundleAPI):
         # We then register the function as the command callback
         # with the chimerax.core.commands module.
         from chimerax.core.commands import register
-        if ci.name == 'volumeperso morphOT':
+        if ci.name == 'MorphOT morphOT':
             from . import morph
             from . import cmd
             func = cmd.volume_morphOT
@@ -60,7 +60,7 @@ class _MyAPI(BundleAPI):
                             synopsis = 'OT interpolate maps')
             register(ci.name, morphot_desc, func)
 
-        if ci.name == 'volumeperso semimorphOT':
+        if ci.name == 'MorphOT semimorphOT':
             from . import morph
             from . import cmd
             func = cmd.volume_semi_morphOT
@@ -87,7 +87,7 @@ class _MyAPI(BundleAPI):
                             synopsis = 'OT interpolate maps')
             register(ci.name, morphot_desc, func)
 
-        if ci.name == 'volumeperso onebarycenter' : 
+        if ci.name == 'MorphOT onebarycenter' : 
             from . import morph
             from . import cmd 
             func = cmd.volume_barycenterOT
@@ -102,7 +102,7 @@ class _MyAPI(BundleAPI):
                                 synopsis = 'does one OT barycenter')
             register(ci.name, onebarycenter_desc, func)
 
-        if ci.name == 'volumeperso barycenterSave' : 
+        if ci.name == 'MorphOT barycenterSave' : 
             from . import morph
             from . import cmd 
             func = cmd.volume_barycenterSave
@@ -120,7 +120,7 @@ class _MyAPI(BundleAPI):
                                 synopsis = 'save many barycenter maps')
             register(ci.name, savebarycenter_desc, func)
 
-        if ci.name == 'volumeperso linearBarycenterSave' : 
+        if ci.name == 'MorphOT linearBarycenterSave' : 
             from . import morph
             from . import cmd 
             func = cmd.volume_linearBarycenterSave

@@ -48,7 +48,11 @@ def volume_morphOT(session, volumes, frames = 25, start = 0, play_step = 0.04,
     if reg == None : 
         reg = max(volumes[0].matrix(step = step, subregion = subregion).shape) / 60.
 
+<<<<<<< HEAD
     session.logger.info('Coucou')
+=======
+    print(reg)
+>>>>>>> 1b176815f5ce5e21c4a63bad2b944230a863b92a
 
     from .mergedmorph import morph_maps_ot
     im = morph_maps_ot(volumes, frames, start, play_step, play_direction, prange,
