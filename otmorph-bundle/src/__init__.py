@@ -34,7 +34,7 @@ class _MyAPI(BundleAPI):
         # We then register the function as the command callback
         # with the chimerax.core.commands module.
         from chimerax.core.commands import register
-        if ci.name == 'volumeperso morphOT':
+        if ci.name == 'MorphOT morphOT':
             from . import morph
             from . import cmd
             func = cmd.volume_morphOT
@@ -48,9 +48,9 @@ class _MyAPI(BundleAPI):
                                         ('niter', IntArg),
                                         ('reg', FloatArg),
                                         ('play_range', Float2Arg),
-                                        ('add_mode', BoolArg),
+                                        #('add_mode', BoolArg),
                                         ('constant_volume', BoolArg),
-                                        ('scale_factors', FloatsArg),
+                                        #('scale_factors', FloatsArg),
                                         ('hide_original_maps', BoolArg),
                                         ('rate', StringArg),
                                         ('interpolate_colors', BoolArg),
@@ -60,7 +60,7 @@ class _MyAPI(BundleAPI):
                             synopsis = 'OT interpolate maps')
             register(ci.name, morphot_desc, func)
 
-        if ci.name == 'volumeperso semimorphOT':
+        if ci.name == 'MorphOT semimorphOT':
             from . import morph
             from . import cmd
             func = cmd.volume_semi_morphOT
@@ -75,9 +75,9 @@ class _MyAPI(BundleAPI):
                                         ('niter', IntArg),
                                         ('reg', FloatArg),
                                         ('play_range', Float2Arg),
-                                        ('add_mode', BoolArg),
+                                        #('add_mode', BoolArg),
                                         ('constant_volume', BoolArg),
-                                        ('scale_factors', FloatsArg),
+                                        #('scale_factors', FloatsArg),
                                         ('hide_original_maps', BoolArg),
                                         ('rate', StringArg),
                                         ('interpolate_colors', BoolArg),
@@ -87,13 +87,13 @@ class _MyAPI(BundleAPI):
                             synopsis = 'OT interpolate maps')
             register(ci.name, morphot_desc, func)
 
-        if ci.name == 'volumeperso onebarycenter' : 
+        if ci.name == 'MorphOT onebarycenter' : 
             from . import morph
             from . import cmd 
             func = cmd.volume_barycenterOT
             varg = cmd.varg 
             ssm_kw = cmd.ssm_kw 
-            onebarycenter_desc = CmdDesc(required = varg + [('weights', Float2Arg)],
+            onebarycenter_desc = CmdDesc(required = varg + [('weights', FloatsArg)],
                                 keyword = [
                                             ('niter', IntArg),
                                             ('reg', FloatArg),
@@ -102,7 +102,7 @@ class _MyAPI(BundleAPI):
                                 synopsis = 'does one OT barycenter')
             register(ci.name, onebarycenter_desc, func)
 
-        if ci.name == 'volumeperso barycenterSave' : 
+        if ci.name == 'MorphOT barycenterSave' : 
             from . import morph
             from . import cmd 
             func = cmd.volume_barycenterSave
@@ -114,11 +114,13 @@ class _MyAPI(BundleAPI):
                                             ('reg', FloatArg),
                                             ('rate',StringArg),
                                             ('interpolate_colors', BoolArg),
-                                            ('maxsize', IntArg)] + ssm_kw,
+                                            ('maxsize', IntArg),
+                                            ('name1', StringArg),
+                                            ('name2', StringArg)] + ssm_kw,
                                 synopsis = 'save many barycenter maps')
             register(ci.name, savebarycenter_desc, func)
 
-        if ci.name == 'volumeperso linearBarycenterSave' : 
+        if ci.name == 'MorphOT linearBarycenterSave' : 
             from . import morph
             from . import cmd 
             func = cmd.volume_linearBarycenterSave

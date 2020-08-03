@@ -48,9 +48,9 @@ class _MyAPI(BundleAPI):
                                         ('niter', IntArg),
                                         ('reg', FloatArg),
                                         ('play_range', Float2Arg),
-                                        ('add_mode', BoolArg),
+                                        #('add_mode', BoolArg),
                                         ('constant_volume', BoolArg),
-                                        ('scale_factors', FloatsArg),
+                                        #('scale_factors', FloatsArg),
                                         ('hide_original_maps', BoolArg),
                                         ('rate', StringArg),
                                         ('interpolate_colors', BoolArg),
@@ -75,9 +75,9 @@ class _MyAPI(BundleAPI):
                                         ('niter', IntArg),
                                         ('reg', FloatArg),
                                         ('play_range', Float2Arg),
-                                        ('add_mode', BoolArg),
+                                        #('add_mode', BoolArg),
                                         ('constant_volume', BoolArg),
-                                        ('scale_factors', FloatsArg),
+                                        #('scale_factors', FloatsArg),
                                         ('hide_original_maps', BoolArg),
                                         ('rate', StringArg),
                                         ('interpolate_colors', BoolArg),
@@ -93,7 +93,7 @@ class _MyAPI(BundleAPI):
             func = cmd.volume_barycenterOT
             varg = cmd.varg 
             ssm_kw = cmd.ssm_kw 
-            onebarycenter_desc = CmdDesc(required = varg + [('weights', Float2Arg)],
+            onebarycenter_desc = CmdDesc(required = varg + [('weights', FloatsArg)],
                                 keyword = [
                                             ('niter', IntArg),
                                             ('reg', FloatArg),
@@ -114,7 +114,9 @@ class _MyAPI(BundleAPI):
                                             ('reg', FloatArg),
                                             ('rate',StringArg),
                                             ('interpolate_colors', BoolArg),
-                                            ('maxsize', IntArg)] + ssm_kw,
+                                            ('maxsize', IntArg),
+                                            ('name1', StringArg),
+                                            ('name2', StringArg)] + ssm_kw,
                                 synopsis = 'save many barycenter maps')
             register(ci.name, savebarycenter_desc, func)
 

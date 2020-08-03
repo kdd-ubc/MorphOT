@@ -264,18 +264,18 @@ def interpolate_colors(f1, v1, f2, v2, v):
 
 def morph_map_linear_ot(volumes, play_steps, play_start, play_step, play_direction,
                play_range, add_mode, adjust_thresholds, scale_factors,
-               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate, gaussfilt):
+               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate):
 
   if hide_maps:
     for v in volumes:
       v.display = False
   
-  if step > 1 and gaussfilt: 
+  """if step > 1 and gaussfilt: 
     for v in volumes :
       from scipy.ndimage import gaussian_filter
       m = v.full_matrix() 
       m = gaussian_filter(m,sigma = 2*step/6.)
-      v.data.values_changed()
+      v.data.values_changed()"""
 
 
   im = Interpolated_Map(volumes, scale_factors, adjust_thresholds, add_mode,
@@ -292,18 +292,18 @@ def morph_map_linear_ot(volumes, play_steps, play_start, play_step, play_directi
 
 def morph_maps_ot(volumes, play_steps, play_start, play_step, play_direction,
                play_range, add_mode, adjust_thresholds, scale_factors,
-               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate, gaussfilt):
+               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate):
 
   if hide_maps:
     for v in volumes:
       v.display = False
   
-  if step > 1 and gaussfilt: 
+  """if step > 1 and gaussfilt: 
     for v in volumes :
       from scipy.ndimage import gaussian_filter
       m = v.full_matrix() 
       m = gaussian_filter(m,sigma = 2*step/6.)
-      v.data.values_changed()
+      v.data.values_changed()"""
 
 
   im = Interpolated_Map(volumes, scale_factors, adjust_thresholds, add_mode,
@@ -357,7 +357,7 @@ def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, mod
   return r
 
 
-def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step = 1, model_id = None) : 
+def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step = 1, model_id = None, name1 = None, name2 = None) : 
   v1 = volumes[0]
   v2 = volumes[1]
 
@@ -378,7 +378,12 @@ def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step =
     padding = len(str(frames))+1
     str_i = str(i)
     padded_i = str_i.zfill(padding)
-    result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
+    if name1 == None : 
+      name1 = v1.name
+    if name2 == None : 
+      name2 = v2.name
+    #result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
+    result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(name1,name2, str(weights))
     import time
     t0 = time.time()
     m = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
@@ -862,7 +867,7 @@ def linear_combination(f1, v1, f2, v2, v, subregion, step):
 
 def semi_morph_maps_ot(volumes, total_play_steps, ot_play_steps, play_start, play_step, play_direction,
                play_range, add_mode, adjust_thresholds, scale_factors,
-               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate, gaussfilt, precompute):
+               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate, precompute):
 
   import numpy as np
 
@@ -870,14 +875,14 @@ def semi_morph_maps_ot(volumes, total_play_steps, ot_play_steps, play_start, pla
     for v in volumes:
       v.display = False
   
-  if step > 1 and gaussfilt: 
+  """if step > 1 and gaussfilt: 
     for v in volumes :
       from scipy.ndimage import gaussian_filter
       m = v.full_matrix() 
       m = gaussian_filter(m,sigma = 2*step/6.)
       #print('on gaussian filtre')
       #m = m[::step,::step,::step]
-      v.data.values_changed()
+      v.data.values_changed()"""
 
 
   im = Semi_Interpolated_Map(volumes, scale_factors, adjust_thresholds, add_mode,

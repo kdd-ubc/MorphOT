@@ -22,7 +22,7 @@ class Interpolated_Map:
   def __init__(self, volumes, scale_factors = None, adjust_thresholds = False,
                add_mode = False, interpolate_colors = True,
                subregion = 'all', step = 1, model_id = None, niter = 20, reg = None, rate = 'linear'):
-    print('Using gool old Interpolated Maps')
+    print('Using good old Interpolated Maps')
     self.volumes = volumes
     v0 = volumes[0]
     self.session = session = v0.session
@@ -415,20 +415,20 @@ def interpolate_colors(f1, v1, f2, v2, v):
 
 def morph_maps_ot(volumes, play_steps, play_start, play_step, play_direction,
                play_range, add_mode, adjust_thresholds, scale_factors,
-               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate, gaussfilt):
+               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate):
 
   if hide_maps:
     for v in volumes:
       v.display = False
   
-  if step > 1 and gaussfilt: 
+  """if step > 1 and gaussfilt: 
     for v in volumes :
       from scipy.ndimage import gaussian_filter
       m = v.full_matrix() 
       m = gaussian_filter(m,sigma = 2*step/6.)
       #print('on gaussian filtre')
       #m = m[::step,::step,::step]
-      v.data.values_changed()
+      v.data.values_changed()"""
 
 
   im = Interpolated_Map(volumes, scale_factors, adjust_thresholds, add_mode,
@@ -459,25 +459,24 @@ def ot_combination(f1, v1, f2, v2, v, subregion, step, niter, reg):
 
 
 def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, model_id = None) : 
-  v1 = volumes[0]
-  v2 = volumes[1]
 
-  m1 = v1.matrix(step = step, subregion = subregion)
-  m2 = v2.matrix(step = step, subregion = subregion)
 
-  
-  alpha = (weights[0],weights[1])
+  ms = [v.matrix(step = step, subregion = subregion) for v in volumes]
 
-  
-  r = v1.writable_copy(require_copy = True, copy_colors = False,
+
+  alpha = tuple([weights[i] for i in range(len(weights))])
+
+  name = [v.name for v in volumes]
+
+  r = volumes[0].writable_copy(require_copy = True, copy_colors = False,
                            unshow_original = False,
                            subregion = subregion, step = step,
-                           model_id = model_id, name = '%s %s weights %s'%(v1.name,v2.name, str(alpha)))
+                           model_id = model_id, name = '%s weights %s'%(str('_'.join(name)), str(alpha)))
 
   m = r.full_matrix()
 
   from .utils import convolutional_barycenter
-  m[:,:,:] = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
+  m[:,:,:] = convolutional_barycenter(ms,reg, weights, niter = niter, verbose = False)
   r.data.values_changed()
   return r
 
@@ -629,7 +628,7 @@ RateMap = {
 
 def semi_morph_maps_ot(volumes, total_play_steps, ot_play_steps, play_start, play_step, play_direction,
                play_range, add_mode, adjust_thresholds, scale_factors,
-               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate, gaussfilt, precompute):
+               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate,  precompute):
 
   import numpy as np
 
@@ -637,14 +636,14 @@ def semi_morph_maps_ot(volumes, total_play_steps, ot_play_steps, play_start, pla
     for v in volumes:
       v.display = False
   
-  if step > 1 and gaussfilt: 
+  """if step > 1 and gaussfilt: 
     for v in volumes :
       from scipy.ndimage import gaussian_filter
       m = v.full_matrix() 
       m = gaussian_filter(m,sigma = 2*step/6.)
       #print('on gaussian filtre')
       #m = m[::step,::step,::step]
-      v.data.values_changed()
+      v.data.values_changed()"""
 
 
   im = Interpolated_Map(volumes, scale_factors, adjust_thresholds, add_mode,
