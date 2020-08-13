@@ -59,9 +59,9 @@ will be displayed without the ChimeraX- prefix.
     <!-- ChimeraX classifiers describe supplied functionality -->
     <ChimeraXClassifier>ChimeraX :: Command :: MorphOT morphOT :: General ::
 	Display OT interpolation of volumes</ChimeraXClassifier>
-    <ChimeraXClassifier>ChimeraX :: Command :: MorphOT semimorphOT :: General ::
+    <ChimeraXClassifier>ChimeraX :: Command :: MorphOT semiMorphOT :: General ::
 	Display OT interpolation of volumes</ChimeraXClassifier>
-    <ChimeraXClassifier>ChimeraX :: Command :: MorphOT onebarycenter :: General ::
+    <ChimeraXClassifier>ChimeraX :: Command :: MorphOT oneBarycenter :: General ::
 	Computes OT bayrcenter of volumes</ChimeraXClassifier>
     <ChimeraXClassifier>ChimeraX :: Command :: MorphOT barycenterSave :: General ::
     Computes and save OT bayrcenter of volumes</ChimeraXClassifier>

@@ -54,13 +54,11 @@ class _MyAPI(BundleAPI):
                                         ('hide_original_maps', BoolArg),
                                         ('rate', StringArg),
                                         ('interpolate_colors', BoolArg),
-                                        ('maxsize',IntArg),
-                                        ('gaussfilt',BoolArg),
-                                        ('semi',BoolArg)] + ssm_kw,
-                            synopsis = 'OT interpolate maps')
+                                        ('maxsize',IntArg)] + ssm_kw,
+                            synopsis = 'OT interpolate between two or more maps')
             register(ci.name, morphot_desc, func)
 
-        if ci.name == 'MorphOT semimorphOT':
+        if ci.name == 'MorphOT semiMorphOT':
             from . import morph
             from . import cmd
             func = cmd.volume_semi_morphOT
@@ -75,19 +73,16 @@ class _MyAPI(BundleAPI):
                                         ('niter', IntArg),
                                         ('reg', FloatArg),
                                         ('play_range', Float2Arg),
-                                        #('add_mode', BoolArg),
                                         ('constant_volume', BoolArg),
-                                        #('scale_factors', FloatsArg),
                                         ('hide_original_maps', BoolArg),
                                         ('rate', StringArg),
                                         ('interpolate_colors', BoolArg),
                                         ('maxsize',IntArg),
-                                        ('gaussfilt',BoolArg),
                                         ('precompute',BoolArg)] + ssm_kw,
-                            synopsis = 'OT interpolate maps')
+                            synopsis = 'mix of OT and linear interpolate two or more maps')
             register(ci.name, morphot_desc, func)
 
-        if ci.name == 'MorphOT onebarycenter' : 
+        if ci.name == 'MorphOT oneBarycenter' : 
             from . import morph
             from . import cmd 
             func = cmd.volume_barycenterOT
@@ -97,9 +92,8 @@ class _MyAPI(BundleAPI):
                                 keyword = [
                                             ('niter', IntArg),
                                             ('reg', FloatArg),
-                                            ('interpolate_colors', BoolArg),
-                                            ('maxsize', IntArg)] + ssm_kw,
-                                synopsis = 'does one OT barycenter')
+                                            ('interpolate_colors', BoolArg)] + ssm_kw,
+                                synopsis = 'Produce one weighted OT barycenter between two or more maps')
             register(ci.name, onebarycenter_desc, func)
 
         if ci.name == 'MorphOT barycenterSave' : 
@@ -117,7 +111,7 @@ class _MyAPI(BundleAPI):
                                             ('maxsize', IntArg),
                                             ('name1', StringArg),
                                             ('name2', StringArg)] + ssm_kw,
-                                synopsis = 'save many barycenter maps')
+                                synopsis = 'save an OT iterpolation between two maps')
             register(ci.name, savebarycenter_desc, func)
 
         if ci.name == 'MorphOT linearBarycenterSave' : 
@@ -133,7 +127,7 @@ class _MyAPI(BundleAPI):
                                             ('rate',StringArg),
                                             ('interpolate_colors', BoolArg),
                                             ('maxsize', IntArg)] + ssm_kw,
-                                synopsis = 'save many linear_barycenter maps')
+                                synopsis = 'save a linear interpolation between two maps')
             register(ci.name, savebarycenter_desc, func)
 
         

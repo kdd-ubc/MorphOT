@@ -27,9 +27,9 @@ Classifier: Operating System :: POSIX :: Linux
 Classifier: ChimeraX :: Bundle :: General :: 1,1 :: chimerax.morphot ::  :: 
 Classifier: ChimeraX :: Command :: MorphOT morphOT :: General ::
 	Display OT interpolation of volumes
-Classifier: ChimeraX :: Command :: MorphOT semimorphOT :: General ::
+Classifier: ChimeraX :: Command :: MorphOT semiMorphOT :: General ::
 	Display OT interpolation of volumes
-Classifier: ChimeraX :: Command :: MorphOT onebarycenter :: General ::
+Classifier: ChimeraX :: Command :: MorphOT oneBarycenter :: General ::
 	Computes OT bayrcenter of volumes
 Classifier: ChimeraX :: Command :: MorphOT barycenterSave :: General ::
     Computes and save OT bayrcenter of volumes

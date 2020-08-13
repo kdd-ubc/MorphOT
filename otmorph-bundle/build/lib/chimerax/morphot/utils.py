@@ -83,7 +83,7 @@ def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,s
     if force_cpu :
         is_gpu = False 
         
-    #print(alpha)
+    
     if is_gpu :
         return convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh,niter,tol,sharpening, verbose)
     else : 
@@ -121,7 +121,7 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
     Hv = np.array(Hv)
     mean_weights = (Hv[0].sum()*alpha[0]+Hv[1].sum()*alpha[1])
 
-    #print('mean weights', mean_weights)
+    
     for i in range(len(Hv)):
 
         Hv[i] = (Hv[i]-Hv[i].min())/Hv[i].sum()
