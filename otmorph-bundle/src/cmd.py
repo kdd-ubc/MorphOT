@@ -121,11 +121,6 @@ def volume_barycenterOT(session, volumes, weights, niter = 20, reg = None, inter
         sizes = ' and '.join([str(s) for s in vs])
         raise CommandError("Volume grid sizes don't match: %s" % sizes)
 
-    if reg == None : 
-        reg = max(volumes[0].matrix(step = step, subregion = subregion).shape)/60.
-
-    
-
 
     if np.product(vs[0]) > maxsize**3 : 
         print('Your structure is bigger than maxsize, resizing for better tractability')
@@ -133,6 +128,15 @@ def volume_barycenterOT(session, volumes, weights, niter = 20, reg = None, inter
         print('You can change maxsize option to prevent resizing')
         downscale_ratio = round(max(list(set(vs))[0])/maxsize)
         step = downscale_ratio 
+
+        
+    if reg == None : 
+        reg = max(volumes[0].matrix(step = step, subregion = subregion).shape)/60.
+
+    
+
+
+    
 
 
     from .mergedmorph import ot_barycenter
