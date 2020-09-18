@@ -1,7 +1,11 @@
 # MorphOT: Transport-based interpolation between EM maps with UCSF ChimeraX
-by Arthur Ecoffet, Frédéric Poitevin and Khanh Dao Duc
 
-This is the repository for distributing our software. For installing and running the software, please refer to the User Manual pdf file.
+## Contributors
+- [Arthur Ecoffet](...)
+- [Frédéric Poitevin](https://github.com/fredericpoitevin) 
+- [Khanh Dao Duc](https://github.com/kdd-ubc/)
+
+This is the repository for distributing our software. For installing and running the software, please refer to the User Manual pdf file or see below.
 
 # What is MorphOT?
 
@@ -31,6 +35,7 @@ Remark: After review by the UCSF ChimeraX team, the tool will be available in th
 
 ## Pre-processing the density maps
 
+Load the EMDB map 5140, smooth it using a gaussian blur, threshold it at the desired value, and rescale it, following the commands below:
 ```
 open emdb:5140
 volume gaussian #1 sd 2
@@ -38,6 +43,7 @@ volume threshold #2 min 0.35
 volume scale #3 shift -0.35
 ```
 
+Follow the same steps on the EMDB map 5138:
 ```
 open emdb:5138
 volume gaussian #5 sd 2
@@ -45,6 +51,7 @@ volume threshold #6 min 0.12
 volume scale #7 shift -0.12
 ```
 
+Align the two resulting maps and resample the second on the first:
 ```
 fitmap #4 in #8
 volume resample #8 onGrid #1
@@ -57,16 +64,27 @@ If you are not sure, you can type `help MorphOT` in the command-line interface o
 
 ### Create morphs
 
+To produce a standard transport-based trajectory, type:
 ```
 MorphOT morphOT #4 #9
 ```
 
+For faster computation, you can use:
 ```
 MorphOT semiMorphOT #4 #9 otFrames 5 frames 25
 ```
 
 ### Replaying morphs
 
+In order to replay a morph that you just generated, do:
 ```
 MorphOT morphOT #4 #9 model #10
+```
+
+Alternatively, you can export the morph to a movie following:
+```
+movie record
+MorphOT morphOT [options]
+movie stop
+movie encode [path]
 ```
