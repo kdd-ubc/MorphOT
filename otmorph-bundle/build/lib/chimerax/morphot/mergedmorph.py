@@ -21,7 +21,7 @@ class Interpolated_Map:
 
   def __init__(self, volumes, scale_factors = None, adjust_thresholds = False, interpolate_colors = True,
                subregion = 'all', step = 1, model_id = None, niter = 20, reg = None, rate = 'linear'):
-    #print('Using good old Interpolated Maps')
+    
     self.volumes = volumes
     v0 = volumes[0]
     self.session = session = v0.session
@@ -142,7 +142,6 @@ class Interpolated_Map:
           reg = self.reg
           niter = self.niter
 
-          #print('weights change 0 :' , weights0 , 'weights change 1', weights1,  'reg and iter ' , reg, niter)
           if self.last_ot_weight == 0 :
             self.tmp_v1 = v1
             self.tmp_v2 = convolutional_barycenter([v1,v2],reg, weights1, niter = niter)
@@ -150,13 +149,12 @@ class Interpolated_Map:
           
           self.tmp_v1 = convolutional_barycenter([v1,v2],reg, weights0 ,niter = niter)
           self.tmp_v2 = convolutional_barycenter([v1,v2],reg, weights1, niter = niter)
-          #print('changing volume took', time.time()-t0)
 
 
         else :
-          print('getting precomputed volumes')
+          
           tmp_index = self.tmp_index
-          print(tmp_index)
+          
           self.tmp_v1 = self.precomputed[tmp_index]
           self.tmp_v2 = self.precomputed[tmp_index+1]
           self.tmp_index = tmp_index+1
@@ -182,7 +180,7 @@ class Interpolated_Map:
       sf2 = f
       sf2 = (sf2-ot_weights[indices[0]]) / (ot_weights[indices[1]] - ot_weights[indices[0]])
       sf1 = 1 - sf2
-      print(sf1,sf2)
+      
 
     vol1 = self.tmp_v1
     vol2 = self.tmp_v2
@@ -329,7 +327,6 @@ class Interpolated_Map:
     n = len(vlist)
     
     weights = define_multivolumes_weights(ot_play_steps,n)
-    #weights = [(round(elm,3), round(1-elm,3)) for elm in ot_weights]
 
     res = []
 
@@ -339,9 +336,7 @@ class Interpolated_Map:
     reg = self.reg
     niter = self.niter 
     for i,weight in enumerate(weights) :
-      #f = weight[0]
-      #i0 = min(n-2,max(0,int(weight[0]*(n-1))))
-      #print(i0)
+      
       wh = np.where(np.array(weight)>0)[0]
       i0,i1 = wh[0],wh[0]+1
 
@@ -355,7 +350,6 @@ class Interpolated_Map:
       #f2 = (f-f0)*(n-1)
       #f1 = 1 - f2
       print('%i of %i precomputed maps'%(i,len(weights)))
-      #tmp = convolutional_barycenter([v1,v2], reg, [f1,f2] , niter = niter)
       tmp = convolutional_barycenter([v1,v2], reg, [weight[i0],weight[i1]] , niter = niter)
       res.append(tmp)
 
@@ -404,33 +398,7 @@ def interpolate_colors(f1, v1, f2, v2, v):
 
 ### AJOUT PERSONNEL 
 
-"""def morph_map_linear_ot(volumes, play_steps, play_start, play_step, play_direction,
-               play_range, add_mode, adjust_thresholds, scale_factors,
-               hide_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate, gaussfilt):
 
-  if hide_maps:
-    for v in volumes:
-      v.display = False
-  
-  if step > 1 and gaussfilt: 
-    for v in volumes :
-      from scipy.ndimage import gaussian_filter
-      m = v.full_matrix() 
-      m = gaussian_filter(m,sigma = 2*step/6.)
-      #print('on gaussian filtre')
-      #m = m[::step,::step,::step]
-      v.data.values_changed()
-
-
-  im = Interpolated_Map(volumes, scale_factors, adjust_thresholds, add_mode,
-                        interpolate_colors, subregion, step, model_id, niter, reg, rate)
-  if play_steps > 0:
-    fmin, fmax = play_range
-    im.play_ot(play_start, fmin, fmax, play_step, None, play_direction, play_steps)
-  else:
-    im.interpolate_ot(play_start)
-
-  return im"""
   
 
 
@@ -464,10 +432,9 @@ def ot_combination(f1, v1, f2, v2, v, subregion, step, niter, reg):
   m1 = v1.matrix(step = step, subregion = subregion)
   m2 = v2.matrix(step = step, subregion = subregion)
   from .utils import convolutional_barycenter, convolutional_barycenter_cpu, convolutional_barycenter_gpu
-  import time 
-  #t0 = time.time()
+  
   m[:,:,:] = convolutional_barycenter([m1,m2],reg,(f1,f2),niter=niter,verbose=False)
-  #print(time.time()-t0)
+  
   v.data.values_changed()
 
 
@@ -522,10 +489,9 @@ def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step =
     #result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
     result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(name1,name2, str(weights))
     #result_file = dir_name + '/ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
-    import time
-    #t0 = time.time()
+    
     m = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
-    #print(time.time()-t0)
+    
     from chimerax.map.data import ArrayGridData
     from chimerax.map.data.mrc import save
 
@@ -560,10 +526,9 @@ def linear_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', st
     if name2 == None : 
       name2 = v2.name
     result_file = dir_name + '/' +padded_i +'lin_%s_%s_weights%s.mrc'%(name1,name2, str(weights))
-    import time
-    #t0 = time.time()
+    
     m = weights[0]*m1+weights[1]*m2
-    #print(time.time()-t0)
+    
     from chimerax.map.data import ArrayGridData
     from chimerax.map.data.mrc import save
 
