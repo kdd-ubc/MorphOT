@@ -1,15 +1,10 @@
 # MorphOT: Transport-based interpolation between EM maps with UCSF ChimeraX
 
-## Contributors
-- [Arthur Ecoffet](...)
-- [Frédéric Poitevin](https://github.com/fredericpoitevin) 
-- [Khanh Dao Duc](https://github.com/kdd-ubc/)
+![OT morphing on chaperonin](.readme_material/chaperonin.png)
+
+MorphOT is  a  plugin  for ChimeraX,  which  allows  users  to  directly  interpolate  multiple density maps.  It relies on adapting and optimizing for EM maps some recent methods of shape interpolation based on optimal transport (OT), resulting in significant improvement in quality of morphing,  compared with the standard command provided withChimeraX. For more details on the method, please see the appendix [here](https://raw.githubusercontent.com/kdd-ubc/MorphOT/master/MorphOT_user_manual.pdf) and the [paper accompanying the software](https://www.biorxiv.org/content/10.1101/2020.09.08.286302v1).
 
 This is the repository for distributing our software. For installing and running the software, please refer to the User Manual pdf file or see below.
-
-# What is MorphOT?
-
-MorphOT is  a  plugin  for ChimeraX,  which  allows  users  to  directly  interpolate  multiple density maps.  It relies on adapting and optimizing for EM maps some recent methods of shape interpolation based on optimal transport (OT), resulting in significant improvement in quality of morphing,  compared with the standard command provided withChimeraX. For more details on the method, please see the appendix and the paper accompanying the software.
 
 # Installation
 
