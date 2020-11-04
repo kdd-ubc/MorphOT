@@ -83,3 +83,19 @@ MorphOT morphOT [options]
 movie stop
 movie encode [path]
 ```
+
+# Computing Time
+
+Here are the times to run MorphOT with the previous maps and a trajectory of 25 frames
+
+## Hardware:
+
+CPU: Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz
+
+GPU: Tesla V100
+
+## Performance (64^3 / 192^3 grids):
+
+CPU: 286s (1.1s per frame) / 71s (0.68s per frame)
+
+GPU: 14172s (57s per frame) / 9983s (40s per frame) 
