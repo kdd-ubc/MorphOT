@@ -102,5 +102,7 @@ Here are the times MorphOT takes to run a trajectory of 25 frames with the previ
 
 
 # Videos
-![](5138_5140_linear.gif)
-![](5138_5140_OT.gif)
+Linear            |  MorphOT
+:-------------------------:|:-------------------------:
+![](5138_5140_linear.gif)  |  ![](5138_5140_OT.gif)
+
