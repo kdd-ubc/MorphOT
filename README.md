@@ -90,12 +90,12 @@ Here are the times MorphOT takes to run a trajectory of 25 frames with the previ
 
 ### CPU (Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz)
 
-64^3 grid: 286s (1.1s per frame) 
+64^3 grid: 28s (1.1s per frame) 
 
-192^3 grid: 71s (0.68s per frame)
+192^3 grid: 1 418s (57s per frame)
 
 ### GPU (Tesla V100)
 
-64^3 grid: 14172s (57s per frame)
+64^3 grid: 17s (0.68s per frame)
 
-192^3 grid: 9983s (40s per frame)  
+192^3 grid: 998s (40s per frame)  
