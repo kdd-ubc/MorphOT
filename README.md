@@ -101,6 +101,6 @@ Here are the times MorphOT takes to run a trajectory of 25 frames with the previ
 192^3 grid: 998s (40s per frame)  
 
 
-
-[![Alt text](https://img.youtube.com/vi/Pk1dTfRhW4o/0.jpg)](https://www.youtube.com/watch?v=Pk1dTfRhW4o)
-
+# Videos
+![](5138_5140_linear.gif)
+![](5138_5140_OT.gif)
