@@ -97,5 +97,5 @@ Grid        | CPU (Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz) | GPU (Tesla V100
 These animations display the result that one should obtain by following the tutorial above, comparing traditional linear interpolation (left) and the transport-based trajectory (right).
 Linear            |  MorphOT
 :-------------------------:|:-------------------------:
-![](5138_5140_linear.gif)  |  ![](5138_5140_OT.gif)
+![](.readme_material/5138_5140_linear.gif)  |  ![](.readme_material/5138_5140_OT.gif)
 
