@@ -52,6 +52,8 @@ fitmap #4 in #8
 volume resample #8 onGrid #1
 ```
 
+Remark: This pre-processing is notably meant to remove the noise around the structure, otherwise the interpolation will try to displace mass that is not part of the molecule, such as noisy blobs in the solvent region. Thresholding and smoothing is one way to deal with this but other approaches can be followed by the user to deal with this, possibly leveraging several tools available in ChimeraX. For instance, another possible strategy could be for the user to first mask the solvent region in the maps.
+
 ## Using MorphOT
 
 ### Not sure what options you have?
