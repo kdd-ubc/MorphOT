@@ -88,18 +88,10 @@ movie encode [path]
 
 Here are the times MorphOT takes to run a trajectory of 25 frames with the previous maps, for both CPU and GPU implementations
 
-### CPU (Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz)
-
-64^3 grid: 28s (1.1s per frame) 
-
-192^3 grid: 1 418s (57s per frame)
-
-### GPU (Tesla V100)
-
-64^3 grid: 17s (0.68s per frame)
-
-192^3 grid: 998s (40s per frame)  
-
+Grid        | CPU (Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz) | GPU (Tesla V100)
+:----------:|:------------------------------------------------:|:---------------:
+64x64x64    | 28s (1.1s per frame)                             | 17s (0.68s per frame)
+192x192x192 | 1,418s (57s per frame)                           | 998s (40s per frame) 
 
 # Videos
 Linear            |  MorphOT
