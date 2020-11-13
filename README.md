@@ -86,6 +86,8 @@ movie stop
 movie encode [path]
 ```
 
+Remark: the movie will be generated with voxel size 1.
+
 # Computing Time
 
 Here are the times MorphOT takes to run a trajectory of 25 frames with the previous maps, for both CPU and GPU implementations
