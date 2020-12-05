@@ -7,21 +7,20 @@ import sys, os
 
 
 
-with mrcfile.open('./data/3los.mrc') as mrc : 
+with mrcfile.open('./emd5138_preprocessed_aligned.mrc') as mrc : 
     _3los = mrc.data
 
-with mrcfile.open('./data/3iyf.mrc') as mrc : 
+with mrcfile.open('./emd5140_preprocessed.mrc') as mrc : 
     _3iyf = mrc.data
 
 
 frames = 25 
 weights = [s/frames for s in range(frames)]
 weights = [(elm,1-elm) for elm in weights]
-print(weights)
-for cgpu in ['cpu','gpu'] : 
-    for niter in [20, 50, 100, 200] : 
-        for downsample in [1,2,3,4] : 
-        
+for cgpu in ['cpu','gpu']: 
+    for downsample in [3,2,1]:
+        print(f"On downsample {downsample}.")
+        for niter in [20] : 
 
             t0 = time.time()
             tmp1 = _3los[::downsample,::downsample,::downsample]
@@ -31,7 +30,7 @@ for cgpu in ['cpu','gpu'] :
             if isFile : 
                 print('stopping')
                 continue
-            
+
             for i in range(10) : 
 
                 for weight in weights :
@@ -40,7 +39,6 @@ for cgpu in ['cpu','gpu'] :
                     else : 
                         convolutional_barycenter_gpu([tmp1,tmp2],max(tmp1.shape)/60,weight, niter = niter)
 
-            
             time_for_10 = time.time()-t0
 
             file_name = './time_results/%s_%s_niter=%i.txt'%(cgpu,tmp1.shape,niter)

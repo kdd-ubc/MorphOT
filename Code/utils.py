@@ -1,15 +1,15 @@
 import numpy as np
-from scipy.ndimage import gaussian_filter, gaussian_filter1d
-from scipy.optimize import newton
-import multiprocessing as mp
+from scipy.optimize import newton 
+from scipy.ndimage import gaussian_filter 
+import mrcfile
 import time
 import sys
-try : 
-    import cupy as cp
-except : 
-    pass
+import cupy as cp
+try:
+    from cupyx.scipy.ndimage import gaussian_filter as cpx_gaussian_filter
+except:
+    print("Failed to import cupyx.scipy.ndimage.gaussian_filter (Made available in 9.0.0a3)")
 
-import mrcfile
 
 
 ###################################################################################################################################
@@ -258,8 +258,8 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
 # ----------------------------------------------------------------------------
 #
 def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, tol = 1e-9,sharpening = False,verbose = False):
-    """Main function solving wasserstein barycenter problem using gpu
 
+    """Main function solving wasserstein barycenter problem using gpu
     Arguments:
         Hv {Set of distributions (cparray)} -- 
         reg {regularization term "gamma"} -- float superior to 0, generally equals size of space/40
@@ -271,13 +271,12 @@ def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, t
         tol {float} -- convergence tolerance at which point iterations stop (default: {1e-9})
         sharpening {bool} -- Whether or not entropic sharpening is used (default: {False})
         verbose {bool} --  verbose option
-
     Returns:
         cparray -- solution of weighted wassertein barycenter problem
     """
-    
+
     def K(x):
-        return cp.array(gaussian_filter(cp.asnumpy(x),sigma=reg))
+        return cpx_gaussian_filter(x, sigma=reg)
     
     def to_find_root(barycenter, H0, beta):
         return entropy(barycenter**beta) - H0

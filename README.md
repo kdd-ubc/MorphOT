@@ -92,10 +92,12 @@ Remark: the movie will be generated with voxel size 1.
 
 Here are the times MorphOT takes to run a trajectory of 25 frames with the previous maps, for both CPU and GPU implementations
 
-Grid        | CPU (Intel(R) Xeon(R) Silver 4116 CPU @ 2.10GHz) | GPU (Tesla V100)
+Grid        | CPU (Intel(R) Core(R) i7-10875H @ 2.30GHz) | GPU(NVIDIA RTX 2070 Super)
 :----------:|:------------------------------------------------:|:---------------:
-64x64x64    | 28s (1.1s per frame)                             | 17s (0.68s per frame)
-192x192x192 | 1,418s (57s per frame)                           | 998s (40s per frame) 
+64x64x64    | 110.5s(0.44s/frame)                             | 6.55 (0.03s per frame)
+96x96x96    | 439.8s (1.76s per frame)                        | 23.5s (0.09s per frame)
+192x192x192 | 5821s (23.28s per frame)                        | 296s (1.18s per frame) 
+
 
 # Videos
 These animations display the result that one should obtain by following the tutorial above, comparing traditional linear interpolation (left) and the transport-based trajectory (right).

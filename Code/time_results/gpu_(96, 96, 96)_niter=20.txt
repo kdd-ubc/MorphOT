@@ -1,0 +1,1 @@
+23.780109643936157seconds for 10 times 25 frames
