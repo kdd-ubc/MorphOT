@@ -3,9 +3,18 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 from scipy.optimize import newton
 import multiprocessing as mp
 import time
+from pkg_resources import packaging
 try : 
     import cupy as cp
+    if packaging.version.parse(cupy.__version__) < packaging.version.parse('8.2.0'):
+        print('Update cupy to at least 8.2.0 for improved GPU performances')
+    else :
+        print('all is good wrt to cupy')
 except : 
+    pass
+try : 
+    import cupyx.scipy.ndimage
+except :
     pass
 
 #import mrcfile
@@ -54,7 +63,7 @@ def compute_from_shape_names(list_shape_names,N, weights):
 
 # ----------------------------------------------------------------------------
 #
-def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,sharpening=False, verbose = False, force_cpu =False):
+def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,sharpening=False, verbose = False, force_cpu =False, cupy_var = None, filter_func = None):
     """Calls convolutional barycenter function depending on whether or not cuda gpus are available
 
     Arguments:
@@ -73,7 +82,7 @@ def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,s
         ndarray/cparray -- solution of weighted wassertein barycenter problem
     """
     try : 
-        import cupy
+        #print(cupy_var.__version__)
         #print('cupy is here, running on gpu')
         is_gpu = True
     except :
@@ -85,7 +94,7 @@ def convolutional_barycenter(Hv,reg,alpha,stabThresh=1e-30,niter=1500,tol=1e-9,s
         
     #print(alpha)
     if is_gpu :
-        return convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh,niter,tol,sharpening, verbose)
+        return convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh,niter,tol,sharpening, verbose,cupy_var,filter_func)
     else : 
         return convolutional_barycenter_cpu(Hv,reg,alpha,stabThresh,niter,tol,sharpening, verbose)
 
@@ -174,7 +183,7 @@ def convolutional_barycenter_cpu(Hv, reg, alpha, stabThresh = 1e-30, niter = 150
 
 # ----------------------------------------------------------------------------
 #
-def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, tol = 1e-9,sharpening = False,verbose = False):
+def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, tol = 1e-9,sharpening = False,verbose = False, cp = None, filter_func = None):
     """Main function solving wasserstein barycenter problem using gpu
 
     Arguments:
@@ -192,9 +201,15 @@ def convolutional_barycenter_gpu(Hv,reg,alpha,stabThresh = 1e-30,niter = 1500, t
     Returns:
         cparray -- solution of weighted wassertein barycenter problem
     """
-    
+    #cp = cupy_var
     def K(x):
-        return cp.array(gaussian_filter(cp.asnumpy(x),sigma=reg))
+        try :
+            
+            lv = filter_func(x,sigma=reg)
+        except : 
+            lv = cp.array(gaussian_filter(cp.asnumpy(x),sigma=reg))
+        return lv
+        #return cp.array(gaussian_filter(cp.asnumpy(x),sigma=reg))
     
     def to_find_root(barycenter, H0, beta):
         return entropy(barycenter**beta) - H0
