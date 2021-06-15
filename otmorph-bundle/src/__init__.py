@@ -92,7 +92,8 @@ class _MyAPI(BundleAPI):
                                 keyword = [
                                             ('niter', IntArg),
                                             ('reg', FloatArg),
-                                            ('interpolate_colors', BoolArg)] + ssm_kw,
+                                            ('interpolate_colors', BoolArg),
+                                            ('maxsize',IntArg)] + ssm_kw,
                                 synopsis = 'Produce one weighted OT barycenter between two or more maps')
             register(ci.name, onebarycenter_desc, func)
 

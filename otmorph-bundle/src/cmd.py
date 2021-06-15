@@ -3,6 +3,8 @@ from chimerax.map import MapsArg, MapStepArg, Float1or3Arg, ValueTypeArg
 from chimerax.map.mapargs import Float2Arg, MapRegionArg
 from chimerax.core.errors import UserError as CommandError
 import numpy as np
+import mrcfile
+import progressbar
 
 def volume_morphOT(session, volumes, frames = 25, start = 0, play_step = .04,
             play_direction = 1, niter = 20, reg = None, rate = 'linear',  play_range = None, 
@@ -10,6 +12,7 @@ def volume_morphOT(session, volumes, frames = 25, start = 0, play_step = .04,
             hide_original_maps = True, interpolate_colors = True, maxsize = 60,
             subregion = 'all', step = 1, model_id = None):
     '''OT interpolate between maps.'''
+    
     
     if len(volumes) < 2:
         raise CommandError('volume morph requires 2 or more volumes, got %d' % len(volumes))
@@ -52,7 +55,7 @@ def volume_morphOT(session, volumes, frames = 25, start = 0, play_step = .04,
     im = morph_maps_ot(volumes, frames, start, play_step, play_direction, prange,
                      constant_volume, scale_factors,
                     hide_original_maps, interpolate_colors, subregion, step, model_id, niter, reg, rate)
-
+    
     return im
 
 

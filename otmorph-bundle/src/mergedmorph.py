@@ -13,6 +13,30 @@
 
 
 #### Scale_Factors and addMode should be deleted to my mind 
+from .utils import *
+
+from pkg_resources import packaging
+try : 
+    import cupy
+    if packaging.version.parse(cupy.__version__) < packaging.version.parse('8.2.0'):
+        print('Update cupy to at least 8.2.0 for improved GPU performances')
+    else :
+    #    print('all is food wrt cupy')
+        pass
+    cupy_var = cupy
+    #print(cupy_var.__version__)
+except : 
+    pass
+
+try : 
+    import cupyx.scipy.ndimage
+    def filter_func(x,sigma) : 
+        return cupyx.scipy.ndimage.gaussian_filter(x,sigma)
+    #filter_func = None
+except :
+    filter_func = None
+    pass
+
 
 
 # -----------------------------------------------------------------------------
@@ -144,11 +168,11 @@ class Interpolated_Map:
 
           if self.last_ot_weight == 0 :
             self.tmp_v1 = v1
-            self.tmp_v2 = convolutional_barycenter([v1,v2],reg, weights1, niter = niter)
+            self.tmp_v2 = convolutional_barycenter([v1,v2],reg, weights1, niter = niter, cupy_var = cupy_var, filter_func = filter_func)
 
           
-          self.tmp_v1 = convolutional_barycenter([v1,v2],reg, weights0 ,niter = niter)
-          self.tmp_v2 = convolutional_barycenter([v1,v2],reg, weights1, niter = niter)
+          self.tmp_v1 = convolutional_barycenter([v1,v2],reg, weights0 ,niter = niter, cupy_var = cupy_var, filter_func = filter_func)
+          self.tmp_v2 = convolutional_barycenter([v1,v2],reg, weights1, niter = niter, cupy_var = cupy_var, filter_func = filter_func)
 
 
         else :
@@ -350,7 +374,7 @@ class Interpolated_Map:
       #f2 = (f-f0)*(n-1)
       #f1 = 1 - f2
       print('%i of %i precomputed maps'%(i,len(weights)))
-      tmp = convolutional_barycenter([v1,v2], reg, [weight[i0],weight[i1]] , niter = niter)
+      tmp = convolutional_barycenter([v1,v2], reg, [weight[i0],weight[i1]] , niter = niter,cupy_var = cupy_var,filter_func = filter_func)
       res.append(tmp)
 
     self.precomputed = res
@@ -421,20 +445,21 @@ def morph_maps_ot(volumes, play_steps, play_start, play_step, play_direction,
     im.play_ot(play_start, fmin, fmax, play_step, None, play_direction, play_steps)
   else:
     im.interpolate_ot(play_start)
-
+  
   return im
 
 
 def ot_combination(f1, v1, f2, v2, v, subregion, step, niter, reg):
   
   m = v.full_matrix()
-
+  
   m1 = v1.matrix(step = step, subregion = subregion)
   m2 = v2.matrix(step = step, subregion = subregion)
-  from .utils import convolutional_barycenter, convolutional_barycenter_cpu, convolutional_barycenter_gpu
-  
-  m[:,:,:] = convolutional_barycenter([m1,m2],reg,(f1,f2),niter=niter,verbose=False)
-  
+  from .utils import convolutional_barycenter
+  import time
+  t0 = time.time()
+  m[:,:,:] = convolutional_barycenter([m1,m2],reg,(f1,f2),niter=niter,verbose=False,cupy_var = cupy_var,filter_func = filter_func)
+  print(time.time()-t0)
   v.data.values_changed()
 
 
@@ -456,7 +481,7 @@ def ot_barycenter(volumes, weights, niter, reg, subregion = 'all', step = 1, mod
   m = r.full_matrix()
 
   from .utils import convolutional_barycenter
-  m[:,:,:] = convolutional_barycenter(ms,reg, weights, niter = niter, verbose = False)
+  m[:,:,:] = convolutional_barycenter(ms,reg, weights, niter = niter, verbose = False, cupy_var = cupy_var, filter_func = filter_func)
   r.data.values_changed()
   return r
 
@@ -490,7 +515,7 @@ def ot_save(volumes, dir_name, frames, niter, reg, rate, subregion='all', step =
     result_file = dir_name + '/' +padded_i +'ot_%s_%s_weights%s.mrc'%(name1,name2, str(weights))
     #result_file = dir_name + '/ot_%s_%s_weights%s.mrc'%(v1.name,v2.name, str(weights))
     
-    m = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False)
+    m = convolutional_barycenter([m1,m2],reg, weights, niter = niter, verbose = False,cupy_var = cupy_var,filter_func = filter_func)
     
     from chimerax.map.data import ArrayGridData
     from chimerax.map.data.mrc import save
